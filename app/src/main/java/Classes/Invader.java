@@ -13,7 +13,7 @@ public class Invader {
 
     // Parametros configurables
     private final int SPEED_FACTOR = 80;
-    private final int SIZE_FACTOR = 20; // Tamaño de los invasores
+    private final int SIZE_FACTOR = 26; // Tamaño de los invasores
     private final int PADDING = 25;
 
     // Para alterar la frecuencia de los disparos

@@ -10,7 +10,7 @@ import com.example.spaceinvaders_labprogramacion.R;
 public class Spaceship {
 
     // Algunos paramentros ajustables
-    private final int SIZE_FACTOR = 16; // Tamaño de la nave
+    private final int SIZE_FACTOR = 22; // Tamaño de la nave
     private final int SPEED_FACTOR = 450; // Velocidad de la nave
 
     RectF rectF; // Mantiene coordenadas de 4 Floats (como las esquinas de un rectangulo)
