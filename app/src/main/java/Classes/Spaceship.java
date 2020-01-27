@@ -46,7 +46,7 @@ public class Spaceship {
 
         // Posicion del Spaceship (aproximadamente en la mitad de la pantalla)
         posX = screenX / 2;
-        posY = screenY - 20;
+        posY = screenY - (screenY / 12);
 
         // Inicializar el Bitmap y ajustarlo a la pantalla
         bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.playership);
@@ -81,6 +81,9 @@ public class Spaceship {
     }
     public float getPosY(){
         return posY;
+    }
+    public float getHeight(){
+        return height;
     }
     public float getLength(){
         return length;

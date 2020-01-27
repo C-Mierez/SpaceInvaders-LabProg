@@ -323,8 +323,8 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawColor(Color.argb(255, 26, 128, 182));
             paint.setColor(Color.argb(255, 255, 255, 255));
 
-            // Draw the player spaceship
-            canvas.drawBitmap(spaceship.getBitmap(), spaceship.getPosX(), screenY - (screenY/8), paint);
+            // Dibujar el spaceship
+            canvas.drawBitmap(spaceship.getBitmap(), spaceship.getPosX(), spaceship.getPosY(), paint);
 
             // Dibujar los invasores
             for(Invader invader: invaders){
@@ -394,7 +394,7 @@ public class GameView extends SurfaceView implements Runnable {
                     }
                 }else{
                     // Para disparar
-                    if(spaceshipProjectile.shoot(spaceship.getPosX() + (spaceship.getLength() / 2), screenY, spaceshipProjectile.UP)){
+                    if(spaceshipProjectile.shoot(spaceship.getPosX() + (spaceship.getLength() / 2), spaceship.getPosY() - (spaceship.getHeight() / 2), spaceshipProjectile.UP)){
                         // TODO Sound Shoot
                         soundPool.play(shootID, 1,1, 0, 0, 1);
                     }
