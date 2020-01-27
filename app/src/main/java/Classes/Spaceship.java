@@ -21,6 +21,9 @@ public class Spaceship {
     private float posX;
     private float posY;
 
+    private int screenX;
+    private int screenY;
+
 
     private float shipSpeed; // Velocidad (pixeles por segundo)
 
@@ -34,6 +37,9 @@ public class Spaceship {
     public Spaceship(Context context, int screenX, int screenY){
 
         rectF = new RectF();
+
+        this.screenX = screenX;
+        this.screenY = screenY;
 
         length = screenX / SIZE_FACTOR;
         height = screenY / SIZE_FACTOR;
@@ -52,9 +58,9 @@ public class Spaceship {
 
     public void update(long fps){
 
-            if(shipCurrentMovement == LEFT){
+            if(shipCurrentMovement == LEFT && posX >= 0){
                 posX -= shipSpeed / fps;
-            }if(shipCurrentMovement == RIGHT){
+            }if(shipCurrentMovement == RIGHT && posX + length <= screenX){
                 posX += shipSpeed / fps;
             }
             // Actualizar rectF con los nuevos valores

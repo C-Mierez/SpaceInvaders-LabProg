@@ -402,7 +402,7 @@ public class GameView extends SurfaceView implements Runnable {
                 break;
             // Al quitar el dedo de la pantalla
             case MotionEvent.ACTION_UP:
-                if(motionEvent.getY() > screenY - screenY/ 10){
+                if(motionEvent.getY() > screenY - screenY / 10){
                     spaceship.setMovementState(spaceship.STOPPED);
                 }
                 break;
