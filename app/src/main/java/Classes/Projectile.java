@@ -6,7 +6,7 @@ public class Projectile {
 
     // Algunos parametros
     public final int SPEED_FACTOR = 550;
-    public final int WIDTH = 4;
+    public final int WIDTH = 8;
 
     // Posicion del proyectil en la pantalla
     private float posX;
@@ -28,7 +28,7 @@ public class Projectile {
     private boolean isActive;
 
     public Projectile(int screenY) {
-        height = screenY / 20;
+        height = screenY / 30;
         width = WIDTH;
         isActive = false;
 
