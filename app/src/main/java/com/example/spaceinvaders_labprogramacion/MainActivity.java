@@ -28,8 +28,6 @@ public class MainActivity extends Activity {
         Point screenResolution = new Point();
         display.getSize(screenResolution);
 
-
-
         // Inicializar gameView con los datos obtenidos
         gameView = new GameView(this, screenResolution.x, screenResolution.y);
         setContentView(gameView);

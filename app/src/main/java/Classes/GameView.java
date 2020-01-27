@@ -65,7 +65,7 @@ public class GameView extends SurfaceView implements Runnable {
     private int damageShelterID = -1;
     private int uhID = -1;
     private int ohID = -1;
-    // TODO Sonido en intervalo
+    // Sonido en intervalo
     private long menaceInterval = 1000;
     private boolean uhOrOh;
     private long lastMenaceTime = System.currentTimeMillis();
@@ -85,7 +85,7 @@ public class GameView extends SurfaceView implements Runnable {
         screenY = y;
 
         soundPool = new SoundPool.Builder().build();
-        //soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0);
+        //soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0); No se usa esto mas. Es un metodo viejo
 
         try {
             // Cargar los sonidos
@@ -123,7 +123,6 @@ public class GameView extends SurfaceView implements Runnable {
                 cant++;
             }
         }
-        menaceInterval = 1000;
 
         // Build the shelters
         numDefenseBlocks = 0;
@@ -156,21 +155,21 @@ public class GameView extends SurfaceView implements Runnable {
             }
             // Sonidito uUrUURuoogogo UWU
             if(!gamePaused) {
-                if ((startFrameTime - lastMenaceTime) > menaceInterval) {
-                    if (uhOrOh) {
-                        soundPool.play(uhID, 1, 1, 0, 0, 1);
-                    } else {
-                        soundPool.play(ohID, 1, 1, 0, 0, 1);
-                    }
-                    lastMenaceTime = System.currentTimeMillis();
-                    uhOrOh = !uhOrOh; // Intercambio
-                }
+                playSound(startFrameTime);
             }
-
         }
-
     }
-
+    private void playSound(long startFrameTime){
+        if ((startFrameTime - lastMenaceTime) > menaceInterval) {
+            if (uhOrOh) {
+                soundPool.play(uhID, 1, 1, 0, 0, 1);
+            } else {
+                soundPool.play(ohID, 1, 1, 0, 0, 1);
+            }
+            lastMenaceTime = System.currentTimeMillis();
+            uhOrOh = !uhOrOh; // Intercambio
+        }
+    }
 
     private void update() {
         // Colision con el borde la pantalla
@@ -205,19 +204,18 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
-        // Dibujar los proyectiles activos de los Invasores
+        // Actualizar los proyectiles activos de los Invasores
         for(Projectile projectile : invaderProjectiles){
             if(projectile != null && projectile.isActive()){
                 projectile.update(fps);
             }
         }
 
-        // Si el invasor ha golpeado el borde
+        // TODO Si el invasor ha golpeado el borde. Solo los visibles?
         if(bumpedScreenBorder){
             for(Invader invader : invaders){
-                if(invader != null){
+                if(invader != null && invader.isVisible()){
                     invader.dropDownAndReverse();
-
                     // Si tocan el suelo, se pierde el juego
                     if(invader.getY() > screenY - screenY / 10){
                         lost = true;
@@ -226,6 +224,7 @@ public class GameView extends SurfaceView implements Runnable {
             }
             menaceInterval -= 80;
         }
+        // TODO Condicion de perdida
         if (lost) {
             prepareLevel();
         }
@@ -294,7 +293,7 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
-        // Colision de proyectil con jugador
+        // Colision de proyectil enemigo con jugador
         for(Projectile projectile : invaderProjectiles){
             if(projectile != null && projectile.isActive()){
                 if(RectF.intersects(spaceship.getRect(), projectile.getRect())){
@@ -359,7 +358,7 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setTextSize(40);
             canvas.drawText("Score: " + score + "   Lives: " + lives, 10, 50, paint);
 
-            // Draw everything to the screen
+            // Liberar el canvas
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
     }
