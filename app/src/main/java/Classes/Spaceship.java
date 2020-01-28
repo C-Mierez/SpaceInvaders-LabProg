@@ -70,6 +70,12 @@ public class Spaceship {
             rectF.right = posX + length;
     }
 
+    public void dead(Context context){
+
+        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.perdedor);
+        bitmap = Bitmap.createScaledBitmap(bitmap, (int)length, (int)height, false);
+    }
+
     public RectF getRect(){
         return rectF;
     }

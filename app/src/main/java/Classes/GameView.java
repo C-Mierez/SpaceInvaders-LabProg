@@ -323,7 +323,7 @@ public class GameView extends SurfaceView implements Runnable {
                         gamePaused = true;
                         currentLives = STARTING_LIVES;
                         currentScore = 0;
-                        prepareLevel();
+                        spaceship.dead(context);
                     }
                 }
             }
