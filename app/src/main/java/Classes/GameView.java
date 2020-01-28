@@ -24,6 +24,8 @@ public class GameView extends SurfaceView implements Runnable {
 
     Context context;
 
+    private final int BAR_PADDING_FACTOR = 10;
+
     // Hilo del juego
     private Thread gameThread = null;
     // Para bloquear la vista antes de dibujar
@@ -116,10 +118,10 @@ public class GameView extends SurfaceView implements Runnable {
         nextInvaderProjectile = 0;
 
         // Crear las filas de invasores
-        int cant = 0;
-        for(int i = 0; i < 6; i++){
-            for(int x = 0; x < 5; x++){
-                invaders[cant] = new Invader(context, i, x, screenX, screenY);
+        int cant = 0, columns = 6;
+        for(int i = 0; i < 4; i++){
+            for(int x = 0; x < columns; x++){
+                invaders[cant] = new Invader(context, i, x, screenX, screenY, screenY / BAR_PADDING_FACTOR, screenX / columns);
                 cant++;
             }
         }

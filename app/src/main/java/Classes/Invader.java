@@ -14,7 +14,9 @@ public class Invader {
     // Parametros configurables
     private final int SPEED_FACTOR = 80;
     private final int SIZE_FACTOR = 26; // Tamaño de los invasores
-    private final int PADDING = 25;
+    public static final int PADDING = 10;
+    public final long TOP_PADDING;
+
 
     // Para alterar la frecuencia de los disparos
     private final int CHANCE_NEAR = 150;
@@ -32,8 +34,11 @@ public class Invader {
     // Parametros de posicion
     private float posX;
     private float posY;
-    private float length;
-    private float height;
+    public static float length;
+    public static float height;
+
+
+
 
     public final int LEFT = 1;
     public final int RIGHT = 2;
@@ -42,19 +47,21 @@ public class Invader {
 
     boolean isVisible;
 
-    public Invader(Context context, int row, int column, int screenX, int screenY) {
+    public Invader(Context context, int row, int column, int screenX, int screenY, long top_padding, long left_padding) {
 
         rectF = new RectF();
 
-        length = screenX / SIZE_FACTOR;
+        length  = screenX / SIZE_FACTOR;
         height = screenY / SIZE_FACTOR;
 
         isVisible = true;
 
-        int padding = screenX / PADDING;
+        TOP_PADDING = top_padding;
 
-        posX = column * (length + padding);
-        posY = row * (length + padding/4);
+        long padding = screenX / PADDING;
+
+        posX = left_padding + column * (length + padding);
+        posY = TOP_PADDING + row * (length + padding / 4);
 
         // Incializar bitmaps y escalarlos
         bitmap1 = BitmapFactory.decodeResource(context.getResources(), R.drawable.invader1);
