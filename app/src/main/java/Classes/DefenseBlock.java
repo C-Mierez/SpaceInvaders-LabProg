@@ -23,13 +23,9 @@ public class DefenseBlock {
 
 
         // TODO Comentar
-        rectF = new RectF(column * width + brickPadding +
-                (shelterPadding * shelterNumber) +
-                shelterPadding + shelterPadding * shelterNumber,
+        rectF = new RectF(column * width + brickPadding + (shelterPadding * shelterNumber) + shelterPadding + shelterPadding * shelterNumber,
                 row * height + brickPadding + startHeight,
-                column * width + width - brickPadding +
-                        (shelterPadding * shelterNumber) +
-                        shelterPadding + shelterPadding * shelterNumber,
+                column * width + width - brickPadding + (shelterPadding * shelterNumber) + shelterPadding + shelterPadding * shelterNumber,
                 row * height + height - brickPadding + startHeight);
     }
 

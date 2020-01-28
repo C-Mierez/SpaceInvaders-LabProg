@@ -60,7 +60,7 @@ public class Invader {
 
         long padding = screenX / PADDING;
 
-        posX = left_padding + column * (length + padding);
+        posX = (column * left_padding) - (length / 2);
         posY = TOP_PADDING + row * (length + padding / 4);
 
         // Incializar bitmaps y escalarlos

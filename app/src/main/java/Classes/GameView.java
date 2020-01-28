@@ -120,17 +120,17 @@ public class GameView extends SurfaceView implements Runnable {
         // Crear las filas de invasores
         int cant = 0, columns = 6;
         for(int i = 0; i < 4; i++){
-            for(int x = 0; x < columns; x++){
+            for(int x = 1; x < columns; x++){
                 invaders[cant] = new Invader(context, i, x, screenX, screenY, screenY / BAR_PADDING_FACTOR, screenX / columns);
                 cant++;
             }
         }
 
-        // Build the shelters
+        // Crear bloques
         numDefenseBlocks = 0;
         for(int shelterNumber = 0; shelterNumber < 4; shelterNumber++){
-            for(int i = 0; i < 5; i ++ ) {
-                for (int x = 0; x < 10; x++) {
+            for(int i = 0; i < 4; i ++ ) {
+                for (int x = 0; x < 8; x++) {
                     defenseBlocks[numDefenseBlocks] = new DefenseBlock(i, x, shelterNumber, screenX, screenY);
                     numDefenseBlocks++;
                 }
