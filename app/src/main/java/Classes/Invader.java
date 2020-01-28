@@ -14,7 +14,7 @@ public class Invader {
     // Parametros configurables
     private final int SPEED_FACTOR = 80;
     private final int SIZE_FACTOR = 26; // Tamaño de los invasores
-    public static final int PADDING = 10;
+    public static final int PADDING = 12;
     public final long TOP_PADDING;
 
 

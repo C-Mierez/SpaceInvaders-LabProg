@@ -19,7 +19,7 @@ public class DefenseBlock {
         int brickPadding = 1;
 
         int shelterPadding = screenX / 9;
-        int startHeight = screenY - (screenY /8 * 2);
+        int startHeight = screenY - (screenY / 8 * 2);
 
 
         // TODO Comentar
