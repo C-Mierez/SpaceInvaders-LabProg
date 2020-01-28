@@ -8,25 +8,24 @@ public class DefenseBlock {
 
     private boolean isVisible;
 
-    public DefenseBlock(int row, int column, int shelterNumber, int screenX, int screenY){
+    public DefenseBlock(int row, int column, int shelterNumber, int screenX, int screenY, int startHeight, long left_padding, int totalColumns){
 
         // TODO Pasar todos los parametros de abajo a constantes para mas facil configuracion
         int width = screenX / 90;
         int height = screenY / 40;
 
         isVisible = true;
-
         int brickPadding = 1;
-
-        int shelterPadding = screenX / 9;
-        int startHeight = screenY - (screenY / 8 * 2);
-
-
         // TODO Comentar
-        rectF = new RectF(column * width + brickPadding + (shelterPadding * shelterNumber) + shelterPadding + shelterPadding * shelterNumber,
+
+        float x = (shelterNumber * left_padding ) + (column * (width + brickPadding) - (totalColumns / 2 * (width + brickPadding)));
+        float y = startHeight + (row * (height + brickPadding));
+        rectF = new RectF(x , y,x + width , y + height);
+
+        /*rectF = new RectF(column * width + brickPadding + (left_padding * shelterNumber) + left_padding + left_padding * shelterNumber,
                 row * height + brickPadding + startHeight,
-                column * width + width - brickPadding + (shelterPadding * shelterNumber) + shelterPadding + shelterPadding * shelterNumber,
-                row * height + height - brickPadding + startHeight);
+                column * width + width - brickPadding + (left_padding * shelterNumber) + left_padding + left_padding * shelterNumber,
+                row * height + height - brickPadding + startHeight);*/
     }
 
     public RectF getRect(){

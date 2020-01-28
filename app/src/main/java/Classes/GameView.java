@@ -4,8 +4,6 @@ package Classes;
 // Además, es quien responde a las entradas por pantalla
 
 import android.content.Context;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,13 +16,20 @@ import android.view.SurfaceView;
 
 import com.example.spaceinvaders_labprogramacion.R;
 
-import java.io.IOException;
+import java.util.Random;
 
 public class GameView extends SurfaceView implements Runnable {
 
     Context context;
 
+    // Algunos parametros
     private final int BAR_PADDING_FACTOR = 10;
+    private final int CANT_ROW_INVADERS = 4;
+    private final int CANT_COLUMN_INVADERS = 6; // Se crean 1 menos que el numero
+    private final int CANT_ROW_DEFENSE = 4;
+    private final int CANT_COLUMN_DEFENSE = 8;
+    private final int CANT_SHELTER_DEFENSE = 5; // Se crean 1 menos que el numero
+    private final int STARTING_LIVES = 3;
 
     // Hilo del juego
     private Thread gameThread = null;
@@ -71,9 +76,13 @@ public class GameView extends SurfaceView implements Runnable {
     private long menaceInterval = 1000;
     private boolean uhOrOh;
     private long lastMenaceTime = System.currentTimeMillis();
-    // Otros datos
-    private int score = 0;
-    private int lives = 3;
+
+    // otros
+    private int currentScore;
+    private int currentLives;
+    private Random random = new Random();
+
+
 
     // Constructor
     public GameView(Context context, int x, int y) {
@@ -118,24 +127,29 @@ public class GameView extends SurfaceView implements Runnable {
         nextInvaderProjectile = 0;
 
         // Crear las filas de invasores
-        int cant = 0, columns = 6;
-        for(int i = 0; i < 4; i++){
+        int cant = 0, columns = CANT_COLUMN_INVADERS;
+        for(int i = 0; i < CANT_ROW_INVADERS; i++){
             for(int x = 1; x < columns; x++){
-                invaders[cant] = new Invader(context, i, x, screenX, screenY, screenY / BAR_PADDING_FACTOR, screenX / columns);
+                 invaders[cant] = new Invader(context, i, x, screenX, screenY, screenY / BAR_PADDING_FACTOR, screenX / columns);
+
                 cant++;
             }
         }
 
         // Crear bloques
         numDefenseBlocks = 0;
-        for(int shelterNumber = 0; shelterNumber < 4; shelterNumber++){
-            for(int i = 0; i < 4; i ++ ) {
-                for (int x = 0; x < 8; x++) {
-                    defenseBlocks[numDefenseBlocks] = new DefenseBlock(i, x, shelterNumber, screenX, screenY);
+        int totalShelterNumber = CANT_SHELTER_DEFENSE; // Se crean 1 menos que el numero
+        columns = CANT_COLUMN_DEFENSE;
+        for(int shelterNumber = 1; shelterNumber < totalShelterNumber; shelterNumber++){
+            for(int i = 0; i < CANT_ROW_DEFENSE; i ++ ) {
+                for (int x = 0; x < columns; x++) {
+                    defenseBlocks[numDefenseBlocks] = new DefenseBlock(i, x, shelterNumber, screenX, screenY, screenY - (screenY / 8 * 2), screenX / totalShelterNumber, columns);
                     numDefenseBlocks++;
                 }
             }
         }
+        currentScore = 0;
+        currentLives = STARTING_LIVES;
     }
 
     @Override
@@ -254,12 +268,12 @@ public class GameView extends SurfaceView implements Runnable {
                         // TODO Sound InvaderExplode
                         soundPool.play(invaderExplodeID, 1, 1, 0, 0, 1);
                         spaceshipProjectile.setInactive();
-                        score = score + 10;
+                        currentScore = currentScore + 10;
                         // TODO Victoria?
-                        if(score == numInvaders * 10){
+                        if(currentScore == numInvaders * 10){
                             gamePaused = true;
-                            score = 0;
-                            lives = 3;
+                            currentScore = 0;
+                            currentLives = STARTING_LIVES;
                             prepareLevel();
                         }
                     }
@@ -300,15 +314,15 @@ public class GameView extends SurfaceView implements Runnable {
             if(projectile != null && projectile.isActive()){
                 if(RectF.intersects(spaceship.getRect(), projectile.getRect())){
                     projectile.setInactive();
-                    lives--;
+                    currentLives--;
                     // TODO Sound PlayerExplode
                     soundPool.play(playerExplodeID, 1, 1, 0, 0, 1);
 
                     // TODO Perdida? dxfdsgdggd
-                    if(lives == 0){
+                    if(currentLives == 0){
                         gamePaused = true;
-                        lives = 3;
-                        score = 0;
+                        currentLives = STARTING_LIVES;
+                        currentScore = 0;
                         prepareLevel();
                     }
                 }
@@ -358,7 +372,7 @@ public class GameView extends SurfaceView implements Runnable {
             // Dinujar los stats
             paint.setColor(Color.argb(255, 249, 129, 0));
             paint.setTextSize(40);
-            canvas.drawText("Score: " + score + "   Lives: " + lives, 10, 50, paint);
+            canvas.drawText("Score: " + currentScore + "   Lives: " + currentLives, 10, 50, paint);
 
             // Liberar el canvas
             surfaceHolder.unlockCanvasAndPost(canvas);

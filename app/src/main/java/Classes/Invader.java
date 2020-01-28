@@ -80,7 +80,6 @@ public class Invader {
         if(invaderCurrentMovement == RIGHT){
             posX += invaderSpeed / fps;
         }
-        // Update rect which is used to detect hits
         rectF.top = posY;
         rectF.bottom = posY + height;
         rectF.left = posX;

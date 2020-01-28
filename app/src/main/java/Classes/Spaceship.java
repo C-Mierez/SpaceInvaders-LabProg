@@ -45,7 +45,7 @@ public class Spaceship {
         height = screenY / SIZE_FACTOR;
 
         // Posicion del Spaceship (aproximadamente en la mitad de la pantalla)
-        posX = screenX / 2;
+        posX = (screenX / 2) - (length / 2);
         posY = screenY - (screenY / 12);
 
         // Inicializar el Bitmap y ajustarlo a la pantalla
