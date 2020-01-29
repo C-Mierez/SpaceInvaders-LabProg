@@ -108,8 +108,7 @@ public class GameView extends SurfaceView implements Runnable {
             ohID = soundPool.load(context, R.raw.oh, 1);
 
         } catch (Exception e) {
-            // Print an error message to the console
-            Log.e("error", "failed to load sound files");
+            Log.e("error", "Error al cargar los sonidos.");
         }
         //prepareLevel();
     }
@@ -135,7 +134,6 @@ public class GameView extends SurfaceView implements Runnable {
                 cant++;
             }
         }
-
         // Crear bloques
         numDefenseBlocks = 0;
         int totalShelterNumber = CANT_SHELTER_DEFENSE; // Se crean 1 menos que el numero
@@ -384,7 +382,7 @@ public class GameView extends SurfaceView implements Runnable {
         try {
             gameThread.join();
         } catch (InterruptedException e) {
-            Log.e("Error:", "joining thread");
+            Log.e("Error:", "Error al hacer .join()");
         }
     }
     public void resume() {

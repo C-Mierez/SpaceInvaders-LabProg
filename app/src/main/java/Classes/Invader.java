@@ -69,7 +69,6 @@ public class Invader {
         bitmap1 = Bitmap.createScaledBitmap(bitmap1, (int) (length), (int) (height),false);
         bitmap2 = Bitmap.createScaledBitmap(bitmap2, (int) (length), (int) (height),false);
 
-        // How fast is the invader in pixels per second
         invaderSpeed = SPEED_FACTOR;
     }
 

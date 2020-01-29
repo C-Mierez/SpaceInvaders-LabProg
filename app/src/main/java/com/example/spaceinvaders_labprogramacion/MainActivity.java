@@ -14,7 +14,6 @@ import Classes.GameView;
 
 public class MainActivity extends Activity {
 
-    // Declaración de variables
     GameView gameView;
 
     @Override
