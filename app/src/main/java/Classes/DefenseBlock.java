@@ -2,17 +2,20 @@ package Classes;
 
 import android.graphics.RectF;
 
-public class DefenseBlock {
+public class DefenseBlock extends Entity {
 
-    private RectF rectF; // :)
+    private final int WIDTH_FACTOR = 90;
+    private final int HEIGHT_FACTOR = 40;
 
-    private boolean isVisible;
 
-    public DefenseBlock(int row, int column, int shelterNumber, int screenX, int screenY, int startHeight, long left_padding, int totalColumns){
+    public DefenseBlock(int row, int column, int shelterNumber, int startHeight, long left_padding, int totalColumns){
+
+        screenX = GameView.screenX;
+        screenY = GameView.screenY;
 
         // TODO Pasar todos los parametros de abajo a constantes para mas facil configuracion
-        int width = screenX / 90;
-        int height = screenY / 40;
+        int width = screenX / WIDTH_FACTOR;
+        int height = screenY / HEIGHT_FACTOR;
 
         isVisible = true;
         int brickPadding = 1;
@@ -22,20 +25,19 @@ public class DefenseBlock {
         float y = startHeight + (row * (height + brickPadding));
         rectF = new RectF(x , y,x + width , y + height);
 
+        bitmap = null;
+        currentBitmap = null;
+        movementSpeed = 0;
+        currentMovement = Movement.STOPPED;
         /*rectF = new RectF(column * width + brickPadding + (left_padding * shelterNumber) + left_padding + left_padding * shelterNumber,
                 row * height + brickPadding + startHeight,
                 column * width + width - brickPadding + (left_padding * shelterNumber) + left_padding + left_padding * shelterNumber,
                 row * height + height - brickPadding + startHeight);*/
     }
 
-    public RectF getRect(){
-        return this.rectF;
-    }
-    public void setInvisible(){
-        isVisible = false;
-    }
-    public boolean getVisibility(){
-        return isVisible;
+    @Override
+    protected void borderCollision() {
+        // :)
     }
 
 }

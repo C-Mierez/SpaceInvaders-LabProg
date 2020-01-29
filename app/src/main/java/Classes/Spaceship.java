@@ -7,97 +7,56 @@ import android.graphics.RectF;
 
 import com.example.spaceinvaders_labprogramacion.R;
 
-public class Spaceship {
+public class Spaceship extends Entity {
 
     // Algunos paramentros ajustables
     private final int SIZE_FACTOR = 22; // Tamaño de la nave
-    private final int SPEED_FACTOR = 450; // Velocidad de la nave
+    private final int MOVEMENT_SPEED = 450;
+    private final int STARTING_X_FACTOR = 2;
+    private final int STARTING_Y_FACTOR = 12;
 
-    RectF rectF; // Mantiene coordenadas de 4 Floats (como las esquinas de un rectangulo)
-
-    private Bitmap bitmap; // Para representar la Spaceship
-    private float height;
-    private float length;
-    private float posX;
-    private float posY;
-
-    private int screenX;
-    private int screenY;
-
-
-    private float shipSpeed; // Velocidad (pixeles por segundo)
-
-    // Direcciones de movimiento (Pues solo hay pocas opciones las volvemos constantes)
-    public final int STOPPED = 0;
-    public final int LEFT = 1;
-    public final int RIGHT = 2;
-
-    public int shipCurrentMovement = STOPPED; // Movimiento actual del Spaceship
-
-    public Spaceship(Context context, int screenX, int screenY){
-
+    public Spaceship(Context context){
         rectF = new RectF();
 
-        this.screenX = screenX;
-        this.screenY = screenY;
+        this.screenX = GameView.screenX;
+        this.screenY = GameView.screenY;
 
-        length = screenX / SIZE_FACTOR;
+        width = screenX / SIZE_FACTOR;
         height = screenY / SIZE_FACTOR;
 
         // Posicion del Spaceship (aproximadamente en la mitad de la pantalla)
-        posX = (screenX / 2) - (length / 2);
-        posY = screenY - (screenY / 12);
+        posX = (screenX / STARTING_X_FACTOR) - (width / 2);
+        posY = screenY - (screenY / STARTING_Y_FACTOR);
 
         // Inicializar el Bitmap y ajustarlo a la pantalla
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.playership);
-        bitmap = Bitmap.createScaledBitmap(bitmap, (int)length, (int)height, false);
+        bitmap = new Bitmap[2]; // Cantidad de imagenes posibles
+        // Nave normal
+        bitmap[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.playership);
+        bitmap[0] = Bitmap.createScaledBitmap(bitmap[0], (int)width, (int)height, false);
+        // Nave destruida
+        bitmap[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.perdedor);
+        bitmap[1] = Bitmap.createScaledBitmap(bitmap[1], (int)width, (int)height, false);
+        // Bitmap inicial
+        currentBitmap = bitmap[0];
 
-        // Velocidad
-        shipSpeed = SPEED_FACTOR;
-    }
+        movementSpeed = MOVEMENT_SPEED;
+        currentMovement = Movement.STOPPED;
 
-    public void update(long fps){
-
-            if(shipCurrentMovement == LEFT && posX >= 0){
-                posX -= shipSpeed / fps;
-            }if(shipCurrentMovement == RIGHT && posX + length <= screenX){
-                posX += shipSpeed / fps;
-            }
-            // Actualizar rectF con los nuevos valores
-            rectF.top = posY;
-            rectF.bottom = posY + height;
-            rectF.left = posX;
-            rectF.right = posX + length;
+        isVisible = true;
     }
 
     public void dead(Context context){
-
-        bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.perdedor);
-        bitmap = Bitmap.createScaledBitmap(bitmap, (int)length, (int)height, false);
+        currentBitmap = bitmap[1];
     }
 
-    public RectF getRect(){
-        return rectF;
+    @Override
+    protected void borderCollision() {
+        if((currentMovement & Movement.LEFT) > 0){
+            posX = 0;
+        }
+        if((currentMovement & Movement.RIGHT) > 0){
+            posX = screenX;
+        }
+        currentMovement = Movement.STOPPED;
     }
-    public Bitmap getBitmap(){
-        return bitmap;
-    }
-    public float getPosX(){
-        return posX;
-    }
-    public float getPosY(){
-        return posY;
-    }
-    public float getHeight(){
-        return height;
-    }
-    public float getLength(){
-        return length;
-    }
-    public void setMovementState(int movement){
-        shipCurrentMovement = movement;
-    }
-
-
-
 }

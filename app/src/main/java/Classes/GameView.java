@@ -4,6 +4,7 @@ package Classes;
 // Además, es quien responde a las entradas por pantalla
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -24,12 +25,15 @@ public class GameView extends SurfaceView implements Runnable {
 
     // Algunos parametros
     private final int BAR_PADDING_FACTOR = 10;
-    private final int CANT_ROW_INVADERS = 4;
-    private final int CANT_COLUMN_INVADERS = 6; // Se crean 1 menos que el numero
-    private final int CANT_ROW_DEFENSE = 4;
-    private final int CANT_COLUMN_DEFENSE = 8;
-    private final int CANT_SHELTER_DEFENSE = 5; // Se crean 1 menos que el numero
+    private final int ROW_INVADERS = 4;
+    private final int COLUMN_INVADERS = 6; // Se crean 1 menos que el numero
+    private final int ROW_DEFENSE = 4;
+    private final int COLUMN_DEFENSE = 8;
+    private final int SHELTER_DEFENSE = 5; // Se crean 1 menos que el numero
     private final int STARTING_LIVES = 3;
+    private final int MIN_MENACE_INTERVAL = 200;
+    private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
+    private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
 
     // Hilo del juego
     private Thread gameThread = null;
@@ -45,8 +49,8 @@ public class GameView extends SurfaceView implements Runnable {
     private long fps;
     private long timeThisFrame;
     // Tamaño de la pantalla
-    private int screenX;
-    private int screenY;
+    public static int screenX;
+    public static int screenY;
 
     // Nave del jugador
     private Spaceship spaceship;
@@ -82,8 +86,6 @@ public class GameView extends SurfaceView implements Runnable {
     private int currentLives;
     private Random random = new Random();
 
-
-
     // Constructor
     public GameView(Context context, int x, int y) {
         super(context);
@@ -116,32 +118,32 @@ public class GameView extends SurfaceView implements Runnable {
     private void prepareLevel() {
 
         // Crear la nave
-        spaceship = new Spaceship(context, screenX, screenY);
+        spaceship = new Spaceship(context);
 
         // Crear el proyectil del Spaceship y los proyectiles de los enemigos
-        spaceshipProjectile = new Projectile(screenY);
-        for(int i = 0; i < invaderProjectiles.length; i++){
-            invaderProjectiles[i] = new Projectile(screenY);
+        spaceshipProjectile = new Projectile();
+        for (int i = 0; i < invaderProjectiles.length; i++) {
+            invaderProjectiles[i] = new Projectile();
         }
         nextInvaderProjectile = 0;
 
         // Crear las filas de invasores
-        int cant = 0, columns = CANT_COLUMN_INVADERS;
-        for(int i = 0; i < CANT_ROW_INVADERS; i++){
-            for(int x = 1; x < columns; x++){
-                 invaders[cant] = new Invader(context, i, x, screenX, screenY, screenY / BAR_PADDING_FACTOR, screenX / columns);
+        int cant = 0, columns = COLUMN_INVADERS;
+        for (int i = 0; i < ROW_INVADERS; i++) {
+            for (int x = 1; x < columns; x++) {
+                invaders[cant] = new Invader(context, i, x, screenY / BAR_PADDING_FACTOR, screenX / columns);
 
                 cant++;
             }
         }
         // Crear bloques
         numDefenseBlocks = 0;
-        int totalShelterNumber = CANT_SHELTER_DEFENSE; // Se crean 1 menos que el numero
-        columns = CANT_COLUMN_DEFENSE;
-        for(int shelterNumber = 1; shelterNumber < totalShelterNumber; shelterNumber++){
-            for(int i = 0; i < CANT_ROW_DEFENSE; i ++ ) {
+        int totalShelterNumber = SHELTER_DEFENSE; // Se crean 1 menos que el numero
+        columns = COLUMN_DEFENSE;
+        for (int shelterNumber = 1; shelterNumber < totalShelterNumber; shelterNumber++) {
+            for (int i = 0; i < ROW_DEFENSE; i++) {
                 for (int x = 0; x < columns; x++) {
-                    defenseBlocks[numDefenseBlocks] = new DefenseBlock(i, x, shelterNumber, screenX, screenY, screenY - (screenY / 8 * 2), screenX / totalShelterNumber, columns);
+                    defenseBlocks[numDefenseBlocks] = new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / totalShelterNumber, columns);
                     numDefenseBlocks++;
                 }
             }
@@ -168,12 +170,12 @@ public class GameView extends SurfaceView implements Runnable {
                 fps = 1000 / timeThisFrame;
             }
             // Sonidito uUrUURuoogogo UWU
-            if(!gamePaused) {
+            if (!gamePaused) {
                 playSound(startFrameTime);
             }
         }
     }
-    private void playSound(long startFrameTime){
+    private void playSound(long startFrameTime) {
         if ((startFrameTime - lastMenaceTime) > menaceInterval) {
             if (uhOrOh) {
                 soundPool.play(uhID, 1, 1, 0, 0, 1);
@@ -184,24 +186,118 @@ public class GameView extends SurfaceView implements Runnable {
             uhOrOh = !uhOrOh; // Intercambio
         }
     }
-
     private void update() {
-        // Colision con el borde la pantalla
-        boolean bumpedScreenBorder = false;
-        // Vidas del juegador terminadas
-        boolean lost = false;
 
+        // Vidas del jugador terminadas
+        boolean lost = currentLives == 0;
+
+        // Actualizar las entidades (invasores, spaceship y proyectiles) activas
+        updateEntities();
+        // Comprobar si hay colisiones
+        updateCollisions();
+
+        // TODO Condicion de perdida
+        if (lost) {
+            prepareLevel();
+        }
+        // Acutalizar el proyectil del Spaceship si ha sido disparado
+        if (spaceshipProjectile.isVisible()) {
+            spaceshipProjectile.update(fps);
+        }
+
+
+    }
+
+    private void updateCollisions(){
+        // Colision de invasor con spaceship
+        for(Invader invader : invaders){
+            if(invader != null && invader.isVisible()){
+                if(RectF.intersects(invader.getRect(),spaceship.getRect())){
+                    // TODO Perdida
+                    if (currentLives == 0) {
+                        gamePaused = true;
+                        currentLives = STARTING_LIVES;
+                        currentScore = 0;
+                        spaceship.dead(context);
+                        prepareLevel();
+                    }
+                }
+            }
+        }
+
+        // Colision del proyectil con un invasor
+        if (spaceshipProjectile.isVisible()) {
+            for (Invader invader : invaders) {
+                if (invader != null && invader.isVisible()) {
+                    if (RectF.intersects(spaceshipProjectile.getRect(), invader.getRect())) {
+                        destroyEntity(invader);
+                        // TODO Victoria?
+                    }
+                }
+            }
+        }
+
+        // Colision de proyectiles con los bloques
+        for (Projectile projectile : invaderProjectiles) {
+            if (projectile != null && projectile.isVisible()) {
+                for (DefenseBlock block : defenseBlocks) {
+                    if (block != null && block.isVisible()) {
+                        if (RectF.intersects(projectile.getRect(), block.getRect())) {
+                            projectile.setVisible(false);
+                            block.setVisible(false);
+                            // TODO Sound Projectile on DefenseBlock
+                            soundPool.play(damageShelterID, 1, 1, 0, 0, 1);
+                        }
+                    }
+                }
+            }
+        }
+        if (spaceshipProjectile.isVisible()) {
+            for (DefenseBlock block : defenseBlocks) {
+                if (block != null && block.isVisible()) {
+                    if (RectF.intersects(spaceshipProjectile.getRect(), block.getRect())) {
+                        spaceshipProjectile.setVisible(false);
+                        block.setVisible(false);
+                        //  TODO Sound Projectile on DefenseBlock
+                        soundPool.play(damageShelterID, 1, 1, 0, 0, 1);
+                    }
+                }
+            }
+        }
+
+        // Colision de proyectil enemigo con jugador
+        for (Projectile projectile : invaderProjectiles) {
+            if (projectile != null && projectile.isVisible()) {
+                if (RectF.intersects(spaceship.getRect(), projectile.getRect())) {
+                    projectile.setVisible(false);
+                    currentLives--;
+                    // TODO Sound PlayerExplode
+                    soundPool.play(playerExplodeID, 1, 1, 0, 0, 1);
+
+                    // TODO Perdida? dxfdsgdggd
+                    if (currentLives == 0) {
+                        gamePaused = true;
+                        currentLives = STARTING_LIVES;
+                        currentScore = 0;
+                        spaceship.dead(context);
+                        prepareLevel();
+                    }
+                }
+            }
+        }
+    }
+    private void updateEntities() {
         // Mover el Spaceship
         spaceship.update(fps);
 
-        // Actualizar los invasores visibles
-        for(Invader invader : invaders){
-            if(invader != null && invader.isVisible()) {
+        // Colision con el borde la pantalla
+        for (Invader invader : invaders) {
+            if (invader != null && invader.isVisible()) {
                 invader.update(fps);
 
                 // Intentar disparar
-                if(invader.takeAim(spaceship.getPosX(), spaceship.getLength())){
-                    if(invaderProjectiles[nextInvaderProjectile] != null && invaderProjectiles[nextInvaderProjectile].shoot(invader.getX() + invader.getLength() / 2, invader.getY(), spaceshipProjectile.DOWN)) {
+                if (invader.takeAim(spaceship.getPosX(), spaceship.getWidth())) {
+                    if (invaderProjectiles[nextInvaderProjectile] != null && invaderProjectiles[nextInvaderProjectile].shoot(invader.getPosX() + invader.getWidth() / 2, invader.getPosY(), Movement.DOWN)) {
                         nextInvaderProjectile++;
                         // Si se consumen todos los proyectiles, se comienza de 0
                         // TODO Quitar el limite de proyectiles
@@ -211,121 +307,27 @@ public class GameView extends SurfaceView implements Runnable {
                     }
 
                 }
-                // Si toca el borde, se setea como que toco
-                if (invader.getX() > screenX - invader.getLength() || invader.getX() < 0){
-                    bumpedScreenBorder = true;
-                }
             }
         }
+        // TODO Reducir el intervalo (velocidad del juego)
+        /*
+        if (menaceInterval - MENACE_INTERVAL_FACTOR >= MIN_MENACE_INTERVAL) {
+            menaceInterval -= MENACE_INTERVAL_FACTOR;
+        }*/
 
         // Actualizar los proyectiles activos de los Invasores
-        for(Projectile projectile : invaderProjectiles){
-            if(projectile != null && projectile.isActive()){
+        for (Projectile projectile : invaderProjectiles) {
+            if (projectile != null && projectile.isVisible()) {
                 projectile.update(fps);
             }
         }
-
-        // TODO Si el invasor ha golpeado el borde. Solo los visibles?
-        if(bumpedScreenBorder){
-            for(Invader invader : invaders){
-                if(invader != null && invader.isVisible()){
-                    invader.dropDownAndReverse();
-                    // Si tocan el suelo, se pierde el juego
-                    if(invader.getY() > screenY - screenY / 10){
-                        lost = true;
-                    }
-                }
-            }
-            menaceInterval -= 80;
-        }
-        // TODO Condicion de perdida
-        if (lost) {
-            prepareLevel();
-        }
-        // Acutalizar el proyectil del Spaceship si ha sido disparado
-        if(spaceshipProjectile.isActive()){
-            spaceshipProjectile.update(fps);
-        }
-
-        // Verificar proyectil no ha tocado los bordes superiores o inferiores, respectivamente
-        if(spaceshipProjectile.getImpactPointY() < 0){
-            spaceshipProjectile.setInactive();
-        }
-        for(Projectile projectile : invaderProjectiles){
-            if(projectile != null && projectile.getImpactPointY() > screenY){
-                projectile.setInactive();
-            }
-        }
-
-        // Colision del proyectil con un invasor
-        if(spaceshipProjectile.isActive()) {
-            for (Invader invader : invaders) {
-                if (invader != null && invader.isVisible()) {
-                    if (RectF.intersects(spaceshipProjectile.getRect(), invader.getRect())) {
-                        invader.setInvisible();
-                        // TODO Sound InvaderExplode
-                        soundPool.play(invaderExplodeID, 1, 1, 0, 0, 1);
-                        spaceshipProjectile.setInactive();
-                        currentScore = currentScore + 10;
-                        // TODO Victoria?
-                        if(currentScore == numInvaders * 10){
-                            gamePaused = true;
-                            currentScore = 0;
-                            currentLives = STARTING_LIVES;
-                            prepareLevel();
-                        }
-                    }
-                }
-            }
-        }
-
-        // Colision de proyectiles con los bloques
-        for(Projectile projectile : invaderProjectiles){
-            if(projectile != null && projectile.isActive()){
-                for(DefenseBlock block : defenseBlocks){
-                    if(block != null && block.getVisibility()){
-                        if(RectF.intersects(projectile.getRect(), block.getRect())){
-                            projectile.setInactive();
-                            block.setInvisible();
-                            // TODO Sound Projectile on DefenseBlock
-                            soundPool.play(damageShelterID, 1, 1, 0, 0, 1);
-                        }
-                    }
-                }
-            }
-        }
-        if(spaceshipProjectile.isActive()){
-            for(DefenseBlock block : defenseBlocks){
-                if(block != null && block.getVisibility()){
-                    if(RectF.intersects(spaceshipProjectile.getRect(), block.getRect())){
-                        spaceshipProjectile.setInactive();
-                        block.setInvisible();
-                        //  TODO Sound Projectile on DefenseBlock
-                        soundPool.play(damageShelterID, 1, 1, 0, 0, 1);
-                    }
-                }
-            }
-        }
-
-        // Colision de proyectil enemigo con jugador
-        for(Projectile projectile : invaderProjectiles){
-            if(projectile != null && projectile.isActive()){
-                if(RectF.intersects(spaceship.getRect(), projectile.getRect())){
-                    projectile.setInactive();
-                    currentLives--;
-                    // TODO Sound PlayerExplode
-                    soundPool.play(playerExplodeID, 1, 1, 0, 0, 1);
-
-                    // TODO Perdida? dxfdsgdggd
-                    if(currentLives == 0){
-                        gamePaused = true;
-                        currentLives = STARTING_LIVES;
-                        currentScore = 0;
-                        spaceship.dead(context);
-                    }
-                }
-            }
-        }
+    }
+    private void destroyEntity(Invader invader){
+        currentScore += invader.SCORE_REWARD * SCORE_FACTOR;
+        invader.setVisible(false);
+        // TODO Sound InvaderExplode
+        soundPool.play(invaderExplodeID, 1, 1, 0, 0, 1);
+        spaceshipProjectile.setVisible(false);
     }
 
     private void draw() {
@@ -338,32 +340,37 @@ public class GameView extends SurfaceView implements Runnable {
             paint.setColor(Color.argb(255, 255, 255, 255));
 
             // Dibujar el spaceship
-            canvas.drawBitmap(spaceship.getBitmap(), spaceship.getPosX(), spaceship.getPosY(), paint);
+            canvas.drawBitmap(spaceship.getCurrentBitmap(), spaceship.getPosX(), spaceship.getPosY(), paint);
 
             // Dibujar los invasores
-            for(Invader invader: invaders){
-                if(invader != null && invader.isVisible()) {
-                    if(uhOrOh) {
-                        canvas.drawBitmap(invader.getBitmap(), invader.getX(), invader.getY(), paint);
-                    }else{
-                        canvas.drawBitmap(invader.getBitmap2(), invader.getX(), invader.getY(), paint);
+            Bitmap[] bitmaps;
+            Bitmap b;
+            for (Invader invader : invaders) {
+                if (invader != null && invader.isVisible()) {
+                    // TODO Hacerlo menos feo
+                    bitmaps = invader.getBitmap();
+                    if (uhOrOh) {
+                        b = bitmaps[0];
+                    } else {
+                        b = bitmaps[1];
                     }
+                    canvas.drawBitmap(b, invader.getPosX(), invader.getPosY(), paint);
                 }
             }
 
             // Dibujar bloques visibles
-            for(DefenseBlock block : defenseBlocks){
-                if(block != null && block.getVisibility()) {
+            for (DefenseBlock block : defenseBlocks) {
+                if (block != null && block.isVisible()) {
                     canvas.drawRect(block.getRect(), paint);
                 }
             }
 
             // Dibujar el proyectil del Spaceship y de los Invasores
-            if(spaceshipProjectile.isActive()){
+            if (spaceshipProjectile.isVisible()) {
                 canvas.drawRect(spaceshipProjectile.getRect(), paint);
             }
-            for(Projectile projectile : invaderProjectiles){
-                if(projectile != null && projectile.isActive()){
+            for (Projectile projectile : invaderProjectiles) {
+                if (projectile != null && projectile.isVisible()) {
                     canvas.drawRect(projectile.getRect(), paint);
                 }
             }
@@ -385,6 +392,7 @@ public class GameView extends SurfaceView implements Runnable {
             Log.e("Error:", "Error al hacer .join()");
         }
     }
+
     public void resume() {
         gamePlaying = true;
         gameThread = new Thread(this);
@@ -399,24 +407,24 @@ public class GameView extends SurfaceView implements Runnable {
             // Al tocar la pantalla
             case MotionEvent.ACTION_DOWN:
                 gamePaused = false;
-                if(motionEvent.getY() > screenY - (screenY / 8)){
+                if (motionEvent.getY() > screenY - (screenY / 8)) {
                     // Para mover la nave
-                    if(motionEvent.getX() > screenX / 2){
-                        spaceship.setMovementState(spaceship.RIGHT);
-                    }else{
-                        spaceship.setMovementState(spaceship.LEFT);
+                    if (motionEvent.getX() > screenX / 2) {
+                        spaceship.setCurrentMovement(Movement.RIGHT);
+                    } else {
+                        spaceship.setCurrentMovement(Movement.LEFT);
                     }
-                }else{
+                } else {
                     // Para disparar
-                    if(spaceshipProjectile.shoot(spaceship.getPosX() + (spaceship.getLength() / 2), spaceship.getPosY() - (spaceship.getHeight() / 2), spaceshipProjectile.UP)){
+                    if (spaceshipProjectile.shoot(spaceship.getPosX() + (spaceship.getWidth() / 2), spaceship.getPosY() - (spaceship.getHeight() / 2), Movement.UP)) {
                         // TODO Sound Shoot
-                        soundPool.play(shootID, 1,1, 0, 0, 1);
+                        soundPool.play(shootID, 1, 1, 0, 0, 1);
                     }
                 }
                 break;
             // Al quitar el dedo de la pantalla
             case MotionEvent.ACTION_UP:
-                spaceship.setMovementState(spaceship.STOPPED);
+                spaceship.setCurrentMovement(Movement.STOPPED);
                 break;
         }
         return true;
