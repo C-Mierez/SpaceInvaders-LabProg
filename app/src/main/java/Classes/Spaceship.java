@@ -45,7 +45,7 @@ public class Spaceship extends Entity {
         isVisible = true;
     }
 
-    public void dead(Context context){
+    public void dead(){
         currentBitmap = bitmap[1];
     }
 

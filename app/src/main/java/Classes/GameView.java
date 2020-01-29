@@ -34,6 +34,7 @@ public class GameView extends SurfaceView implements Runnable {
     private final int MIN_MENACE_INTERVAL = 200;
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
+    private final int SCORE_TO_WIN = 100;
 
     // Hilo del juego
     private Thread gameThread = null;
@@ -131,8 +132,9 @@ public class GameView extends SurfaceView implements Runnable {
         int cant = 0, columns = COLUMN_INVADERS;
         for (int i = 0; i < ROW_INVADERS; i++) {
             for (int x = 1; x < columns; x++) {
-                invaders[cant] = new Invader(context, i, x, screenY / BAR_PADDING_FACTOR, screenX / columns);
-
+                if(random.nextInt(1000) > 100){
+                    invaders[cant] = new Invader(context, i, x, screenY / BAR_PADDING_FACTOR, screenX / columns);
+                }
                 cant++;
             }
         }
@@ -187,19 +189,17 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
     private void update() {
-
         // Vidas del jugador terminadas
-        boolean lost = currentLives == 0;
-
+        if(currentLives == 0){
+            lose();
+        }
+        if(currentScore == SCORE_TO_WIN){
+            win();
+        }
         // Actualizar las entidades (invasores, spaceship y proyectiles) activas
         updateEntities();
         // Comprobar si hay colisiones
         updateCollisions();
-
-        // TODO Condicion de perdida
-        if (lost) {
-            prepareLevel();
-        }
         // Acutalizar el proyectil del Spaceship si ha sido disparado
         if (spaceshipProjectile.isVisible()) {
             spaceshipProjectile.update(fps);
@@ -212,10 +212,7 @@ public class GameView extends SurfaceView implements Runnable {
             if(invader != null && invader.isVisible()){
                 if(RectF.intersects(invader.getRect(),spaceship.getRect())){
                     // TODO Perdida
-                    gamePaused = true;
-                    spaceship.dead(context);
-                    prepareLevel();
-
+                    lose();
                 }
             }
         }
@@ -268,15 +265,6 @@ public class GameView extends SurfaceView implements Runnable {
                     currentLives--;
                     // TODO Sound PlayerExplode
                     soundPool.play(playerExplodeID, 1, 1, 0, 0, 1);
-
-                    // TODO Perdida? dxfdsgdggd
-                    if (currentLives == 0) {
-                        gamePaused = true;
-                        currentLives = STARTING_LIVES;
-                        currentScore = 0;
-                        spaceship.dead(context);
-                        prepareLevel();
-                    }
                 }
             }
         }
@@ -377,6 +365,30 @@ public class GameView extends SurfaceView implements Runnable {
             // Liberar el canvas
             surfaceHolder.unlockCanvasAndPost(canvas);
         }
+    }
+
+    private void win(){
+        gamePaused = true;
+        spaceship.dead();
+        draw();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        prepareLevel();
+    }
+
+    private void lose(){
+        gamePaused = true;
+        spaceship.dead();
+        draw();
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        prepareLevel();
     }
 
     public void pause() {
