@@ -10,26 +10,26 @@ public class Movement {
 
     public static void updateMovement(Entity entity, long fps){
 
-        if((entity.getCurrentMovement() & UP) > 0 && entity.getPosY() >= 0){
-            entity.setPosY(entity.getPosY() - entity.getMovementSpeed());
-            if(entity.getPosY() < 0){
+        if((entity.getCurrentMovement() & UP) > 0 && entity.getPosY() - entity.getHeight() >= 0){
+            entity.setPosY(entity.getPosY() - entity.getMovementSpeed() / fps);
+            if(entity.getPosY() - entity.getHeight() < 0){
                 entity.borderCollision();
             }
         }
         if((entity.getCurrentMovement() & DOWN) > 0 && entity.getPosY() <= GameView.screenY){
-            entity.setPosY(entity.getPosY() + entity.getMovementSpeed());
+            entity.setPosY(entity.getPosY() + entity.getMovementSpeed() / fps);
             if(entity.getPosY() > GameView.screenY){
                 entity.borderCollision();
             }
         }
-        if((entity.getCurrentMovement() & RIGHT) > 0 && entity.getPosX() < GameView.screenX){
-            entity.setPosX(entity.getPosX() + entity.getMovementSpeed());
-            if(entity.getPosX() > GameView.screenX){
+        if((entity.getCurrentMovement() & RIGHT) > 0 && entity.getPosX() + entity.getWidth() < GameView.screenX){
+            entity.setPosX(entity.getPosX() + entity.getMovementSpeed() / fps);
+            if(entity.getPosX() + entity.getWidth() > GameView.screenX){
                 entity.borderCollision();
             }
         }
         if((entity.getCurrentMovement() & LEFT) > 0 && entity.getPosX() > 0){
-            entity.setPosX(entity.getPosX() - entity.getMovementSpeed());
+            entity.setPosX(entity.getPosX() - entity.getMovementSpeed() / fps);
             if(entity.getPosX() < 0){
                 entity.borderCollision();
             }

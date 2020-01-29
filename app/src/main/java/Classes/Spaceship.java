@@ -55,7 +55,7 @@ public class Spaceship extends Entity {
             posX = 0;
         }
         if((currentMovement & Movement.RIGHT) > 0){
-            posX = screenX;
+            posX = screenX - width;
         }
         currentMovement = Movement.STOPPED;
     }

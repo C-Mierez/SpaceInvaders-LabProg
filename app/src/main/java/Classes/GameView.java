@@ -204,8 +204,6 @@ public class GameView extends SurfaceView implements Runnable {
         if (spaceshipProjectile.isVisible()) {
             spaceshipProjectile.update(fps);
         }
-
-
     }
 
     private void updateCollisions(){

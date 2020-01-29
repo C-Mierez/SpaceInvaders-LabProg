@@ -37,7 +37,7 @@ public class Invader extends Entity {
 
         isVisible = true;
         movementSpeed = SPEED_FACTOR;
-        currentMovement = Movement.STOPPED;
+        currentMovement = Movement.LEFT;
 
         TOP_PADDING = top_padding;
         long padding = screenX / PADDING;
