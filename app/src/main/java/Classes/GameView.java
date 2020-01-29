@@ -30,7 +30,7 @@ public class GameView extends SurfaceView implements Runnable {
     private final int ROW_DEFENSE = 4;
     private final int COLUMN_DEFENSE = 8;
     private final int SHELTER_DEFENSE = 5; // Se crean 1 menos que el numero
-    private final int STARTING_LIVES = 3;
+    private final int STARTING_LIVES = 5;
     private final int MIN_MENACE_INTERVAL = 200;
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
@@ -212,13 +212,10 @@ public class GameView extends SurfaceView implements Runnable {
             if(invader != null && invader.isVisible()){
                 if(RectF.intersects(invader.getRect(),spaceship.getRect())){
                     // TODO Perdida
-                    if (currentLives == 0) {
-                        gamePaused = true;
-                        currentLives = STARTING_LIVES;
-                        currentScore = 0;
-                        spaceship.dead(context);
-                        prepareLevel();
-                    }
+                    gamePaused = true;
+                    spaceship.dead(context);
+                    prepareLevel();
+
                 }
             }
         }

@@ -13,7 +13,7 @@ public class Invader extends Entity {
 
     // Parametros configurables
     private final int SPEED_FACTOR = 80;
-    private final float SPEED_INCREASE_FACTOR = 1.10f;
+    private final float SPEED_INCREASE_FACTOR = 1.19f;
     private final int SIZE_FACTOR = 26; // Tamaño de los invasores
     public static final int PADDING = 12;
     public final long TOP_PADDING;
