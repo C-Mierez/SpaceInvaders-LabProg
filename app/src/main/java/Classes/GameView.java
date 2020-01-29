@@ -30,7 +30,7 @@ public class GameView extends SurfaceView implements Runnable {
     private final int ROW_DEFENSE = 4;
     private final int COLUMN_DEFENSE = 8;
     private final int SHELTER_DEFENSE = 5; // Se crean 1 menos que el numero
-    private final int STARTING_LIVES = 5;
+    private final int STARTING_LIVES = 500;
     private final int MIN_MENACE_INTERVAL = 200;
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
@@ -256,6 +256,16 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
+        // TODO Colision de invasor con bloques
+        /*
+        for(int i = 0; i < invaders.length && invaders[i] != null && invaders[i].isVisible(); i++){
+            for(int x = 0; x < defenseBlocks.length && defenseBlocks[x] != null && defenseBlocks[x].isVisible(); x++){
+                if(RectF.intersects(invaders[i].getRect(), defenseBlocks[x].getRect())){
+                    defenseBlocks[x].setVisible(false);
+                    soundPool.play(damageShelterID, 1,1,0,0,1);
+                }
+            }
+        }*/
     }
     private void updateEntities() {
         // Mover el Spaceship

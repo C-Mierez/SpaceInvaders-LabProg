@@ -12,7 +12,7 @@ import java.util.Random;
 public class Invader extends Entity {
 
     // Parametros configurables
-    private final int SPEED_FACTOR = 80;
+    private final int SPEED_FACTOR = 50;
     private final float SPEED_INCREASE_FACTOR = 1.19f;
     private final int SIZE_FACTOR = 26; // Tamaño de los invasores
     public static final int PADDING = 12;
@@ -36,7 +36,7 @@ public class Invader extends Entity {
         height = screenY / SIZE_FACTOR;
 
         isVisible = true;
-        movementSpeed = 10 + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
+        movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
         currentMovement = Movement.LEFT;
 
         TOP_PADDING = top_padding;
