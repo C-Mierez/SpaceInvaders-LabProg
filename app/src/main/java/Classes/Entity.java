@@ -34,6 +34,9 @@ public abstract class Entity {
         rectF.right = posX + width;
     }
 
+    public int getScoreReward(){
+        return 0;
+    }
 
     public RectF getRect() {
         return rectF;

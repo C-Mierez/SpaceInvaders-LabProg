@@ -36,7 +36,7 @@ public class Invader extends Entity {
         height = screenY / SIZE_FACTOR;
 
         isVisible = true;
-        movementSpeed = SPEED_FACTOR;
+        movementSpeed = 10 + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
         currentMovement = Movement.LEFT;
 
         TOP_PADDING = top_padding;
@@ -81,5 +81,10 @@ public class Invader extends Entity {
         // TODO Velocidad de decenso de los invasores
         posY += height;
         movementSpeed *= SPEED_INCREASE_FACTOR;
+    }
+
+    @Override
+    public int getScoreReward(){
+        return SCORE_REWARD;
     }
 }

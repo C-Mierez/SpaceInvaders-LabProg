@@ -216,29 +216,23 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
-
         // Colision del proyectil con un invasor
         if (spaceshipProjectile.isVisible()) {
             for (Invader invader : invaders) {
                 if (invader != null && invader.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), invader.getRect())) {
-                        destroyEntity(invader);
-                        // TODO Victoria?
+                        destroyEntities(invader, spaceshipProjectile,true,invaderExplodeID);
                     }
                 }
             }
         }
-
         // Colision de proyectiles con los bloques
         for (Projectile projectile : invaderProjectiles) {
             if (projectile != null && projectile.isVisible()) {
                 for (DefenseBlock block : defenseBlocks) {
                     if (block != null && block.isVisible()) {
                         if (RectF.intersects(projectile.getRect(), block.getRect())) {
-                            projectile.setVisible(false);
-                            block.setVisible(false);
-                            // TODO Sound Projectile on DefenseBlock
-                            soundPool.play(damageShelterID, 1, 1, 0, 0, 1);
+                            destroyEntities(projectile,block,false,damageShelterID);
                         }
                     }
                 }
@@ -248,10 +242,7 @@ public class GameView extends SurfaceView implements Runnable {
             for (DefenseBlock block : defenseBlocks) {
                 if (block != null && block.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), block.getRect())) {
-                        spaceshipProjectile.setVisible(false);
-                        block.setVisible(false);
-                        //  TODO Sound Projectile on DefenseBlock
-                        soundPool.play(damageShelterID, 1, 1, 0, 0, 1);
+                        destroyEntities(spaceshipProjectile,block,false,damageShelterID);
                     }
                 }
             }
@@ -261,10 +252,7 @@ public class GameView extends SurfaceView implements Runnable {
         for (Projectile projectile : invaderProjectiles) {
             if (projectile != null && projectile.isVisible()) {
                 if (RectF.intersects(spaceship.getRect(), projectile.getRect())) {
-                    projectile.setVisible(false);
-                    currentLives--;
-                    // TODO Sound PlayerExplode
-                    soundPool.play(playerExplodeID, 1, 1, 0, 0, 1);
+                    damagePlayer(projectile);
                 }
             }
         }
@@ -305,12 +293,21 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
     }
-    private void destroyEntity(Invader invader){
-        currentScore += invader.SCORE_REWARD * SCORE_FACTOR;
-        invader.setVisible(false);
+    private void damagePlayer(Entity entity){
+        entity.setVisible(false);
+        currentLives--;
+        // TODO Sound PlayerExplode
+        soundPool.play(playerExplodeID, 1, 1, 0, 0, 1);
+    }
+
+    private void destroyEntities(Entity entity, Entity entity2, boolean gainScore, int soundID){
+        entity.setVisible(false);
+        entity2.setVisible(false);
+        if(gainScore){
+            currentScore += (entity.getScoreReward() + entity2.getScoreReward()) * SCORE_FACTOR;
+        }
         // TODO Sound InvaderExplode
-        soundPool.play(invaderExplodeID, 1, 1, 0, 0, 1);
-        spaceshipProjectile.setVisible(false);
+        soundPool.play(soundID, 1, 1, 0, 0, 1);
     }
 
     private void draw() {
