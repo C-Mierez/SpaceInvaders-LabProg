@@ -27,7 +27,7 @@ public class Invader extends Entity {
 
     Random randomGenerator = new Random();
 
-    public Invader(Context context, int y, int x) {
+    public Invader(Context context, int y) {
 
         rectF = new RectF();
 
@@ -47,7 +47,7 @@ public class Invader extends Entity {
         /*posX = (column * left_padding) - (width / 2);
         posY = TOP_PADDING + row * (width + padding / 4);*/
 
-        posX = x;
+        posX = width + randomGenerator.nextInt( (int)(screenX - (width * 2)));
         posY = y;
 
         // Incializar bitmaps y escalarlos
