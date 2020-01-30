@@ -277,6 +277,13 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
+        // Colision de proyectil jugador con proyectil enemigo
+        for(Projectile projectile : invaderProjectiles){
+            if(projectile.isVisible() && RectF.intersects(spaceshipProjectile.getRect(), projectile.getRect())){
+                destroyEntities(projectile,spaceshipProjectile,false, damageShelterID);
+            }
+        }
+
 
         // Colision de proyectil enemigo con jugador
         for (Projectile projectile : invaderProjectiles) {
