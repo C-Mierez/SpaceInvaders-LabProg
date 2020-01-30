@@ -68,7 +68,7 @@ public class GameView extends SurfaceView implements Runnable {
     // TODO Proyectiles de los Invasores
     public static LinkedBlockingQueue<Projectile> invaderProjectiles;
     // Invasores
-    public static LinkedBlockingQueue<Invader> invaders;
+    public static LinkedBlockingQueue<Entity> invaders;
     // Bloques de defensa
     public static LinkedBlockingQueue<DefenseBlock> defenseBlocks;
 
@@ -138,7 +138,7 @@ public class GameView extends SurfaceView implements Runnable {
         // Crear las filas de invasores al azar
         invaders = new LinkedBlockingQueue<>();
         for (int i = 0; i < invaderAmount; i++) {
-            invaders.add(new Invader(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+            invaders.add(new UFO(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
         }
         // Crear bloques
         defenseBlocks = new LinkedBlockingQueue<>();
@@ -228,7 +228,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void updateCollisions() {
         // Colision de invasor con spaceship
-        for (Invader invader : invaders) {
+        for (Entity invader : invaders) {
             if (invader.isVisible()) {
                 if (RectF.intersects(invader.getRect(), spaceship.getRect())) {
                     // TODO Perdida
@@ -237,7 +237,7 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
         // TODO Colision de invasor con bloques
-        for (Invader invader : invaders) {
+        for (Entity invader : invaders) {
             if (invader.isVisible()) {
                 for (DefenseBlock block : defenseBlocks) {
                     if (block != null && block.isVisible()) {
@@ -251,7 +251,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
         // Colision del proyectil con un invasor
         if (spaceshipProjectile.isVisible()) {
-            for (Invader invader : invaders) {
+            for (Entity invader : invaders) {
                 if (invader.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), invader.getRect())) {
                         destroyEntities(invader, spaceshipProjectile, true, invaderExplodeID);
@@ -302,12 +302,12 @@ public class GameView extends SurfaceView implements Runnable {
         spaceship.update(fps);
 
         // Colision con el borde la pantalla
-        for (Invader invader : invaders) {
+        for (Entity invader : invaders) {
             if (invader.isVisible()) {
                 invader.update(fps);
                 // Intentar disparar
-                if (invader.tryShooting(spaceship.getPosX(), spaceship.getWidth())) {
-                    invader.shoot();
+                if (((Invader)invader).tryShooting(spaceship.getPosX(), spaceship.getWidth())) {
+                    ((Invader)invader).shoot();
                 }
             }
         }
@@ -351,7 +351,7 @@ public class GameView extends SurfaceView implements Runnable {
             // Dibujar los invasores
             Bitmap[] bitmaps;
             Bitmap b;
-            for (Invader invader : invaders) {
+            for (Entity invader : invaders) {
                 if (invader != null && invader.isVisible()) {
                     // TODO Hacerlo menos feo
                     bitmaps = invader.getBitmap();
