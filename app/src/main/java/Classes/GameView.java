@@ -27,6 +27,7 @@ public class GameView extends SurfaceView implements Runnable {
     Context context;
 
     // Algunos parametros
+    private final int INPUT_PLAYER_MOVEMENT_FACTOR = 8;
     private final int BAR_PADDING_FACTOR = 10;
     private final int ROW_INVADERS = 4;
     private final int COLUMN_INVADERS = 6; // Se crean 1 menos que el numero
@@ -35,6 +36,8 @@ public class GameView extends SurfaceView implements Runnable {
     private final int SHELTER_DEFENSE = 5; // Se crean 1 menos que el numero
     private final int STARTING_LIVES = 500;
     private final int STARTING_MENACE_INTERVAL = 1000;
+    private final float INVADER_INCREASE_FACTOR = 1.4f;
+    private final int STARTING_INVADER_AMOUNT = 6;
     private final byte INCREASE_SPEED_LIMIT = 10;
     private final int MIN_MENACE_INTERVAL = 240;
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
@@ -64,18 +67,11 @@ public class GameView extends SurfaceView implements Runnable {
     private Projectile spaceshipProjectile;
 
     // TODO Proyectiles de los Invasores
-    //private Projectile[] invaderProjectiles = new Projectile[200];
     public static LinkedBlockingQueue<Projectile> invaderProjectiles;
-    private int nextInvaderProjectile;
-    private final int MAX_INVADER_PROJECTILES = 10;
     // Invasores
-    //Invader[] invaders = new Invader[60];
     public static LinkedBlockingQueue<Invader> invaders;
-    int numInvaders = 0;
     // Bloques de defensa
-    //private DefenseBlock[] defenseBlocks = new DefenseBlock[400];
     public static LinkedBlockingQueue<DefenseBlock> defenseBlocks;
-    private int numDefenseBlocks;
 
     // Sonidos ( incializados por default)
     private SoundPool soundPool;
@@ -94,6 +90,7 @@ public class GameView extends SurfaceView implements Runnable {
     // otros
     private int currentScore;
     private int currentLives;
+    private int invaderAmount;
     private Random random = new Random();
 
     // Constructor
@@ -122,6 +119,7 @@ public class GameView extends SurfaceView implements Runnable {
         } catch (Exception e) {
             Log.e("error", "Error al cargar los sonidos.");
         }
+        invaderAmount = STARTING_INVADER_AMOUNT;
         //prepareLevel();
     }
 
@@ -133,33 +131,19 @@ public class GameView extends SurfaceView implements Runnable {
         // Crear el proyectil del Spaceship y los proyectiles de los enemigos
         spaceshipProjectile = new Projectile();
 
-        invaderProjectiles = new LinkedBlockingQueue<Projectile>();
-        /*
-        for (int i = 0; i < invaderProjectiles.size(); i++) {
-            invaderProjectiles[i] = new Projectile();
-        }
-        nextInvaderProjectile = 0;
-        */
-        // Crear las filas de invasores
-        invaders = new LinkedBlockingQueue<Invader>();
-        int columns = COLUMN_INVADERS;
-        for (int i = 0; i < ROW_INVADERS; i++) {
-            for (int x = 1; x < columns; x++) {
-                if(random.nextInt(1000) > 100){
-                    invaders.add(new Invader(context, i, x, screenY / BAR_PADDING_FACTOR, screenX / columns));
-                }
-            }
+        invaderProjectiles = new LinkedBlockingQueue<>();
+        // Crear las filas de invasores al azar
+        invaders = new LinkedBlockingQueue<>();
+        for (int i = 0; i < invaderAmount; i++) {
+            invaders.add(new Invader(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5)), 50 + random.nextInt(screenX - 100)));
         }
         // Crear bloques
-        defenseBlocks = new LinkedBlockingQueue<DefenseBlock>();
-        numDefenseBlocks = 0;
+        defenseBlocks = new LinkedBlockingQueue<>();
         int totalShelterNumber = SHELTER_DEFENSE; // Se crean 1 menos que el numero
-        columns = COLUMN_DEFENSE;
         for (int shelterNumber = 1; shelterNumber < totalShelterNumber; shelterNumber++) {
             for (int i = 0; i < ROW_DEFENSE; i++) {
-                for (int x = 0; x < columns; x++) {
-                    defenseBlocks.add(new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / totalShelterNumber, columns));
-                    numDefenseBlocks++;
+                for (int x = 0; x < COLUMN_DEFENSE; x++) {
+                    defenseBlocks.add(new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / totalShelterNumber, COLUMN_DEFENSE));
                 }
             }
         }
@@ -170,6 +154,8 @@ public class GameView extends SurfaceView implements Runnable {
         menaceInterval = STARTING_MENACE_INTERVAL;
         lastMenaceTime = System.currentTimeMillis();
         increaseSpeedCounter = 0;
+        // Para la siguiente ronda
+        invaderAmount *= INVADER_INCREASE_FACTOR;
     }
 
     @Override
@@ -195,7 +181,8 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
     }
-    private void increaseSpeed(long startFrameTime){
+
+    private void increaseSpeed(long startFrameTime) {
         // Hacer sonar sonido cuando se cumple el intervalo
         if ((startFrameTime - lastMenaceTime) > menaceInterval) {
             if (uhOrOh) {
@@ -213,12 +200,13 @@ public class GameView extends SurfaceView implements Runnable {
         }
 
     }
+
     private void update() {
         // Vidas del jugador terminadas
-        if(currentLives == 0){
+        if (currentLives == 0) {
             lose();
         }
-        if(currentScore == SCORE_TO_WIN){
+        if (currentScore == SCORE_TO_WIN) {
             win();
         }
         // Actualizar las entidades (invasores, spaceship y proyectiles) activas
@@ -231,22 +219,22 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    private void updateCollisions(){
+    private void updateCollisions() {
         // Colision de invasor con spaceship
-        for(Invader invader : invaders){
-            if(invader.isVisible()){
-                if(RectF.intersects(invader.getRect(),spaceship.getRect())){
+        for (Invader invader : invaders) {
+            if (invader.isVisible()) {
+                if (RectF.intersects(invader.getRect(), spaceship.getRect())) {
                     // TODO Perdida
                     lose();
                 }
             }
         }
         // TODO Colision de invasor con bloques
-        for(Invader invader : invaders){
-            if(invader.isVisible()){
-                for(DefenseBlock block : defenseBlocks){
-                    if(block != null && block.isVisible()){
-                        if(RectF.intersects(invader.getRect(),block.getRect())){
+        for (Invader invader : invaders) {
+            if (invader.isVisible()) {
+                for (DefenseBlock block : defenseBlocks) {
+                    if (block != null && block.isVisible()) {
+                        if (RectF.intersects(invader.getRect(), block.getRect())) {
                             block.setVisible(false);
                             // soundPool.play(damageShelterID, 1,1,0,0,1);
                         }
@@ -259,7 +247,7 @@ public class GameView extends SurfaceView implements Runnable {
             for (Invader invader : invaders) {
                 if (invader.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), invader.getRect())) {
-                        destroyEntities(invader, spaceshipProjectile,true,invaderExplodeID);
+                        destroyEntities(invader, spaceshipProjectile, true, invaderExplodeID);
                     }
                 }
             }
@@ -270,7 +258,7 @@ public class GameView extends SurfaceView implements Runnable {
                 for (DefenseBlock block : defenseBlocks) {
                     if (block != null && block.isVisible()) {
                         if (RectF.intersects(projectile.getRect(), block.getRect())) {
-                            destroyEntities(projectile,block,false,damageShelterID);
+                            destroyEntities(projectile, block, false, damageShelterID);
                         }
                     }
                 }
@@ -280,7 +268,7 @@ public class GameView extends SurfaceView implements Runnable {
             for (DefenseBlock block : defenseBlocks) {
                 if (block != null && block.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), block.getRect())) {
-                        destroyEntities(spaceshipProjectile,block,false,damageShelterID);
+                        destroyEntities(spaceshipProjectile, block, false, damageShelterID);
                     }
                 }
             }
@@ -295,6 +283,7 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
     }
+
     private void updateEntities() {
         // Mover el Spaceship
         spaceship.update(fps);
@@ -316,17 +305,18 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
     }
-    private void damagePlayer(Entity entity){
+
+    private void damagePlayer(Entity entity) {
         entity.setVisible(false);
         currentLives--;
         // TODO Sound PlayerExplode
         soundPool.play(playerExplodeID, 1, 1, 0, 0, 1);
     }
 
-    private void destroyEntities(Entity entity, Entity entity2, boolean gainScore, int soundID){
+    private void destroyEntities(Entity entity, Entity entity2, boolean gainScore, int soundID) {
         entity.setVisible(false);
         entity2.setVisible(false);
-        if(gainScore){
+        if (gainScore) {
             currentScore += (entity.getScoreReward() + entity2.getScoreReward()) * SCORE_FACTOR;
         }
         // TODO Sound InvaderExplode
@@ -387,7 +377,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
-    private void win(){
+    private void win() {
         gamePaused = true;
         spaceship.dead();
         draw();
@@ -399,7 +389,7 @@ public class GameView extends SurfaceView implements Runnable {
         prepareLevel();
     }
 
-    private void lose(){
+    private void lose() {
         gamePaused = true;
         spaceship.dead();
         draw();
@@ -433,7 +423,7 @@ public class GameView extends SurfaceView implements Runnable {
             // Al tocar la pantalla
             case MotionEvent.ACTION_DOWN:
                 gamePaused = false;
-                if (motionEvent.getY() > screenY - (screenY / 8)) {
+                if (motionEvent.getY() > screenY - (screenY / INPUT_PLAYER_MOVEMENT_FACTOR)) {
                     // Para mover la nave
                     if (motionEvent.getX() > screenX / 2) {
                         spaceship.setCurrentMovement(Movement.RIGHT);

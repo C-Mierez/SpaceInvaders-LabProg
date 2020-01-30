@@ -18,7 +18,7 @@ public class Invader extends Entity {
     private final float SPEED_INCREASE_FACTOR = 1.19f;
     private final int SIZE_FACTOR = 26; // Tamaño de los invasores
     public static final int PADDING = 12;
-    public final long TOP_PADDING;
+    //public final long TOP_PADDING;
     public final int SCORE_REWARD = 10;
     // Para alterar la frecuencia de los disparos
     private final int CHANCE_NEAR = 150;
@@ -27,7 +27,7 @@ public class Invader extends Entity {
 
     Random randomGenerator = new Random();
 
-    public Invader(Context context, int row, int column, long top_padding, long left_padding) {
+    public Invader(Context context, int y, int x) {
 
         rectF = new RectF();
 
@@ -41,11 +41,14 @@ public class Invader extends Entity {
         movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
         currentMovement = Movement.LEFT;
 
-        TOP_PADDING = top_padding;
+        //TOP_PADDING = top_padding;
         long padding = screenX / PADDING;
 
-        posX = (column * left_padding) - (width / 2);
-        posY = TOP_PADDING + row * (width + padding / 4);
+        /*posX = (column * left_padding) - (width / 2);
+        posY = TOP_PADDING + row * (width + padding / 4);*/
+
+        posX = x;
+        posY = y;
 
         // Incializar bitmaps y escalarlos
         bitmap = new Bitmap[3]; // TODO Agregar explosion
