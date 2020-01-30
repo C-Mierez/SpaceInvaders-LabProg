@@ -13,6 +13,7 @@ public class Invader extends Entity {
 
     // Parametros configurables
     private final int SPEED_FACTOR = 50;
+    private final int MAX_SPEED = 200;
     private final float SPEED_INCREASE_FACTOR = 1.19f;
     private final int SIZE_FACTOR = 26; // Tamaño de los invasores
     public static final int PADDING = 12;
@@ -80,7 +81,11 @@ public class Invader extends Entity {
 
         // TODO Velocidad de decenso de los invasores
         posY += height;
-        movementSpeed *= SPEED_INCREASE_FACTOR;
+        if(movementSpeed * SPEED_INCREASE_FACTOR <= MAX_SPEED){
+            movementSpeed *= SPEED_INCREASE_FACTOR;
+        }else{
+            movementSpeed = MAX_SPEED;
+        }
     }
 
     @Override

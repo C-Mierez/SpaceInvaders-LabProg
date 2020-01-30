@@ -31,7 +31,9 @@ public class GameView extends SurfaceView implements Runnable {
     private final int COLUMN_DEFENSE = 8;
     private final int SHELTER_DEFENSE = 5; // Se crean 1 menos que el numero
     private final int STARTING_LIVES = 500;
-    private final int MIN_MENACE_INTERVAL = 200;
+    private final int STARTING_MENACE_INTERVAL = 1000;
+    private final byte INCREASE_SPEED_LIMIT = 10;
+    private final int MIN_MENACE_INTERVAL = 240;
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
     private final int SCORE_TO_WIN = 100;
@@ -78,9 +80,10 @@ public class GameView extends SurfaceView implements Runnable {
     private int uhID = -1;
     private int ohID = -1;
     // Sonido en intervalo
-    private long menaceInterval = 1000;
+    private long menaceInterval;
     private boolean uhOrOh;
-    private long lastMenaceTime = System.currentTimeMillis();
+    private long lastMenaceTime;
+    private byte increaseSpeedCounter;
 
     // otros
     private int currentScore;
@@ -150,8 +153,13 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
+        // TODO Guardar score de rondas anteriores
         currentScore = 0;
         currentLives = STARTING_LIVES;
+
+        menaceInterval = STARTING_MENACE_INTERVAL;
+        lastMenaceTime = System.currentTimeMillis();
+        increaseSpeedCounter = 0;
     }
 
     @Override
@@ -173,11 +181,12 @@ public class GameView extends SurfaceView implements Runnable {
             }
             // Sonidito uUrUURuoogogo UWU
             if (!gamePaused) {
-                playSound(startFrameTime);
+                increaseSpeed(startFrameTime);
             }
         }
     }
-    private void playSound(long startFrameTime) {
+    private void increaseSpeed(long startFrameTime){
+        // Hacer sonar sonido cuando se cumple el intervalo
         if ((startFrameTime - lastMenaceTime) > menaceInterval) {
             if (uhOrOh) {
                 soundPool.play(uhID, 1, 1, 0, 0, 1);
@@ -185,8 +194,14 @@ public class GameView extends SurfaceView implements Runnable {
                 soundPool.play(ohID, 1, 1, 0, 0, 1);
             }
             lastMenaceTime = System.currentTimeMillis();
-            uhOrOh = !uhOrOh; // Intercambio
+            uhOrOh = !uhOrOh; // Intercambio de sonido
+            // Aumentar la velocidad de los enemigos tras pasar
+            if (menaceInterval - MENACE_INTERVAL_FACTOR >= MIN_MENACE_INTERVAL && increaseSpeedCounter++ >= INCREASE_SPEED_LIMIT) {
+                menaceInterval -= MENACE_INTERVAL_FACTOR;
+                increaseSpeedCounter = 0;
+            }
         }
+
     }
     private void update() {
         // Vidas del jugador terminadas
@@ -294,11 +309,6 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
-        // TODO Reducir el intervalo (velocidad del juego)
-        /*
-        if (menaceInterval - MENACE_INTERVAL_FACTOR >= MIN_MENACE_INTERVAL) {
-            menaceInterval -= MENACE_INTERVAL_FACTOR;
-        }*/
 
         // Actualizar los proyectiles activos de los Invasores
         for (Projectile projectile : invaderProjectiles) {
