@@ -216,6 +216,20 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
+        // TODO Colision de invasor con bloques
+        for(Invader invader : invaders){
+            if(invader != null && invader.isVisible()){
+                for(DefenseBlock block : defenseBlocks){
+                    if(block != null && block.isVisible()){
+                        if(RectF.intersects(invader.getRect(),block.getRect())){
+                            block.setVisible(false);
+                            // soundPool.play(damageShelterID, 1,1,0,0,1);
+                        }
+                    }
+                }
+            }
+        }
+
         // Colision del proyectil con un invasor
         if (spaceshipProjectile.isVisible()) {
             for (Invader invader : invaders) {
@@ -256,16 +270,6 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
-        // TODO Colision de invasor con bloques
-        /*
-        for(int i = 0; i < invaders.length && invaders[i] != null && invaders[i].isVisible(); i++){
-            for(int x = 0; x < defenseBlocks.length && defenseBlocks[x] != null && defenseBlocks[x].isVisible(); x++){
-                if(RectF.intersects(invaders[i].getRect(), defenseBlocks[x].getRect())){
-                    defenseBlocks[x].setVisible(false);
-                    soundPool.play(damageShelterID, 1,1,0,0,1);
-                }
-            }
-        }*/
     }
     private void updateEntities() {
         // Mover el Spaceship

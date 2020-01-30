@@ -21,9 +21,10 @@ public class DefenseBlock extends Entity {
         int brickPadding = 1;
         // TODO Comentar
 
-        float x = (shelterNumber * left_padding ) + (column * (width + brickPadding) - (totalColumns / 2 * (width + brickPadding)));
-        float y = startHeight + (row * (height + brickPadding));
-        rectF = new RectF(x , y,x + width , y + height);
+        posX = (shelterNumber * left_padding ) + (column * (width + brickPadding) - (totalColumns / 2 * (width + brickPadding)));
+        posY= startHeight + (row * (height + brickPadding));
+        rectF = new RectF(posX , posY,posX + width , posY + height);
+
 
         bitmap = null;
         currentBitmap = null;
