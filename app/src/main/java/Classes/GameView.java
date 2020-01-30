@@ -87,6 +87,7 @@ public class GameView extends SurfaceView implements Runnable {
     private byte increaseSpeedCounter;
 
     // otros
+    private int currentLevel;
     private int currentScore;
     private int currentLives;
     private int invaderAmount;
@@ -121,6 +122,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
         invaderAmount = STARTING_INVADER_AMOUNT;
         shelterAmount = SHELTER_DEFENSE_AMOUNT;
+        currentLevel = 0;
         //prepareLevel();
     }
 
@@ -159,6 +161,7 @@ public class GameView extends SurfaceView implements Runnable {
         increaseSpeedCounter = 0;
         // Para la siguiente ronda
         invaderAmount *= INVADER_INCREASE_FACTOR;
+        currentLevel++;
 
     }
 
@@ -284,7 +287,6 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
-
         // Colision de proyectil enemigo con jugador
         for (Projectile projectile : invaderProjectiles) {
             if (projectile != null && projectile.isVisible()) {
@@ -381,7 +383,7 @@ public class GameView extends SurfaceView implements Runnable {
             // Dinujar los stats
             paint.setColor(Color.argb(255, 249, 129, 0));
             paint.setTextSize(40);
-            canvas.drawText("Score: " + currentScore + "   Lives: " + currentLives, 10, 50, paint);
+            canvas.drawText("Score: " + currentScore + "   Lives: " + currentLives + "   Level: " + currentLevel, 10, 50, paint);
 
             // Liberar el canvas
             surfaceHolder.unlockCanvasAndPost(canvas);
