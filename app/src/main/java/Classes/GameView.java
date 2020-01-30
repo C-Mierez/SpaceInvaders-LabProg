@@ -31,7 +31,8 @@ public class GameView extends SurfaceView implements Runnable {
     private final int COLUMN_INVADERS = 6; // Se crean 1 menos que el numero
     private final int ROW_DEFENSE = 4;
     private final int COLUMN_DEFENSE = 8;
-    private final int SHELTER_DEFENSE_AMOUNT = 5; // Se crean 1 menos que el numero
+    private final int SHELTER_DEFENSE_AMOUNT = 6; // Se crean 1 menos que el numero
+    private final float SHELTER_DECREASE_FACTOR = 1.17f;
     private final int STARTING_LIVES = 500;
     private final int STARTING_MENACE_INTERVAL = 1000;
     private final float INVADER_INCREASE_FACTOR = 1.4f;
@@ -139,12 +140,12 @@ public class GameView extends SurfaceView implements Runnable {
         }
         // Crear bloques
         defenseBlocks = new LinkedBlockingQueue<>();
-        int totalShelterNumber = shelterAmount; // Se crean 1 menos que el numero
-        for (int shelterNumber = 1; shelterNumber < totalShelterNumber; shelterNumber++) {
+        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT);
+        for (int shelterNumber = 1; shelterNumber < shelterAmount; shelterNumber++) {
             for (int i = 0; i < ROW_DEFENSE; i++) {
                 for (int x = 0; x < COLUMN_DEFENSE; x++) {
-                    if(random.nextInt(1000) > 300){
-                        defenseBlocks.add(new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / totalShelterNumber, COLUMN_DEFENSE));
+                    if(random.nextInt(1000) > 300 * SHELTER_DECREASE_FACTOR){
+                        defenseBlocks.add(new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / shelterAmount, COLUMN_DEFENSE));
                     }
                 }
             }
@@ -158,9 +159,7 @@ public class GameView extends SurfaceView implements Runnable {
         increaseSpeedCounter = 0;
         // Para la siguiente ronda
         invaderAmount *= INVADER_INCREASE_FACTOR;
-        if(shelterAmount > 1){
-            shelterAmount--;
-        }
+
     }
 
     @Override
