@@ -7,6 +7,7 @@ import android.graphics.RectF;
 
 import com.example.spaceinvaders_labprogramacion.R;
 
+import java.util.ArrayList;
 import java.util.Random;
 
 public class Invader extends Entity {
@@ -55,7 +56,7 @@ public class Invader extends Entity {
         currentBitmap = bitmap[0];
     }
 
-    public boolean takeAim(float playerShipX, float playerShipLength){
+    public boolean tryShooting(float playerShipX, float playerShipLength){
         int randomNumber;
         boolean shoot = false;
         // Si se esta cerca del jugador
@@ -86,6 +87,10 @@ public class Invader extends Entity {
         }else{
             movementSpeed = MAX_SPEED;
         }
+    }
+
+    public void shoot(){
+        GameView.invaderProjectiles.add(new Projectile(posX + width / 2, posY, Movement.DOWN));
     }
 
     @Override

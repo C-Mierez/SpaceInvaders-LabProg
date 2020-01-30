@@ -24,13 +24,13 @@ public class Movement {
         }
         if((entity.getCurrentMovement() & RIGHT) > 0 && entity.getPosX() + entity.getWidth() < GameView.screenX){
             entity.setPosX(entity.getPosX() + entity.getMovementSpeed() / fps);
-            if(entity.getPosX() + entity.getWidth() > GameView.screenX){
+            if(entity.getPosX() + entity.getWidth() >= GameView.screenX){
                 entity.borderCollision();
             }
         }
         if((entity.getCurrentMovement() & LEFT) > 0 && entity.getPosX() > 0){
             entity.setPosX(entity.getPosX() - entity.getMovementSpeed() / fps);
-            if(entity.getPosX() < 0){
+            if(entity.getPosX() <= 0){
                 entity.borderCollision();
             }
         }

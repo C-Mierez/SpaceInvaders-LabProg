@@ -17,7 +17,10 @@ import android.view.SurfaceView;
 
 import com.example.spaceinvaders_labprogramacion.R;
 
+import java.util.ArrayList;
 import java.util.Random;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public class GameView extends SurfaceView implements Runnable {
 
@@ -61,14 +64,17 @@ public class GameView extends SurfaceView implements Runnable {
     private Projectile spaceshipProjectile;
 
     // TODO Proyectiles de los Invasores
-    private Projectile[] invaderProjectiles = new Projectile[200];
+    //private Projectile[] invaderProjectiles = new Projectile[200];
+    public static LinkedBlockingQueue<Projectile> invaderProjectiles;
     private int nextInvaderProjectile;
     private final int MAX_INVADER_PROJECTILES = 10;
     // Invasores
-    Invader[] invaders = new Invader[60];
+    //Invader[] invaders = new Invader[60];
+    public static LinkedBlockingQueue<Invader> invaders;
     int numInvaders = 0;
     // Bloques de defensa
-    private DefenseBlock[] defenseBlocks = new DefenseBlock[400];
+    //private DefenseBlock[] defenseBlocks = new DefenseBlock[400];
+    public static LinkedBlockingQueue<DefenseBlock> defenseBlocks;
     private int numDefenseBlocks;
 
     // Sonidos ( incializados por default)
@@ -126,29 +132,33 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Crear el proyectil del Spaceship y los proyectiles de los enemigos
         spaceshipProjectile = new Projectile();
-        for (int i = 0; i < invaderProjectiles.length; i++) {
+
+        invaderProjectiles = new LinkedBlockingQueue<Projectile>();
+        /*
+        for (int i = 0; i < invaderProjectiles.size(); i++) {
             invaderProjectiles[i] = new Projectile();
         }
         nextInvaderProjectile = 0;
-
+        */
         // Crear las filas de invasores
-        int cant = 0, columns = COLUMN_INVADERS;
+        invaders = new LinkedBlockingQueue<Invader>();
+        int columns = COLUMN_INVADERS;
         for (int i = 0; i < ROW_INVADERS; i++) {
             for (int x = 1; x < columns; x++) {
                 if(random.nextInt(1000) > 100){
-                    invaders[cant] = new Invader(context, i, x, screenY / BAR_PADDING_FACTOR, screenX / columns);
+                    invaders.add(new Invader(context, i, x, screenY / BAR_PADDING_FACTOR, screenX / columns));
                 }
-                cant++;
             }
         }
         // Crear bloques
+        defenseBlocks = new LinkedBlockingQueue<DefenseBlock>();
         numDefenseBlocks = 0;
         int totalShelterNumber = SHELTER_DEFENSE; // Se crean 1 menos que el numero
         columns = COLUMN_DEFENSE;
         for (int shelterNumber = 1; shelterNumber < totalShelterNumber; shelterNumber++) {
             for (int i = 0; i < ROW_DEFENSE; i++) {
                 for (int x = 0; x < columns; x++) {
-                    defenseBlocks[numDefenseBlocks] = new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / totalShelterNumber, columns);
+                    defenseBlocks.add(new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / totalShelterNumber, columns));
                     numDefenseBlocks++;
                 }
             }
@@ -224,7 +234,7 @@ public class GameView extends SurfaceView implements Runnable {
     private void updateCollisions(){
         // Colision de invasor con spaceship
         for(Invader invader : invaders){
-            if(invader != null && invader.isVisible()){
+            if(invader.isVisible()){
                 if(RectF.intersects(invader.getRect(),spaceship.getRect())){
                     // TODO Perdida
                     lose();
@@ -233,7 +243,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
         // TODO Colision de invasor con bloques
         for(Invader invader : invaders){
-            if(invader != null && invader.isVisible()){
+            if(invader.isVisible()){
                 for(DefenseBlock block : defenseBlocks){
                     if(block != null && block.isVisible()){
                         if(RectF.intersects(invader.getRect(),block.getRect())){
@@ -244,11 +254,10 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
-
         // Colision del proyectil con un invasor
         if (spaceshipProjectile.isVisible()) {
             for (Invader invader : invaders) {
-                if (invader != null && invader.isVisible()) {
+                if (invader.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), invader.getRect())) {
                         destroyEntities(invader, spaceshipProjectile,true,invaderExplodeID);
                     }
@@ -292,24 +301,14 @@ public class GameView extends SurfaceView implements Runnable {
 
         // Colision con el borde la pantalla
         for (Invader invader : invaders) {
-            if (invader != null && invader.isVisible()) {
+            if (invader.isVisible()) {
                 invader.update(fps);
-
                 // Intentar disparar
-                if (invader.takeAim(spaceship.getPosX(), spaceship.getWidth())) {
-                    if (invaderProjectiles[nextInvaderProjectile] != null && invaderProjectiles[nextInvaderProjectile].shoot(invader.getPosX() + invader.getWidth() / 2, invader.getPosY(), Movement.DOWN)) {
-                        nextInvaderProjectile++;
-                        // Si se consumen todos los proyectiles, se comienza de 0
-                        // TODO Quitar el limite de proyectiles
-                        if (nextInvaderProjectile == MAX_INVADER_PROJECTILES) {
-                            nextInvaderProjectile = 0;
-                        }
-                    }
-
+                if (invader.tryShooting(spaceship.getPosX(), spaceship.getWidth())) {
+                    invader.shoot();
                 }
             }
         }
-
         // Actualizar los proyectiles activos de los Invasores
         for (Projectile projectile : invaderProjectiles) {
             if (projectile != null && projectile.isVisible()) {
@@ -427,7 +426,6 @@ public class GameView extends SurfaceView implements Runnable {
         gameThread.start();
     }
 
-
     @Override
     public boolean onTouchEvent(MotionEvent motionEvent) {
         // Listener para cuando se toca la pantalla
@@ -457,6 +455,4 @@ public class GameView extends SurfaceView implements Runnable {
         }
         return true;
     }
-
-
 }
