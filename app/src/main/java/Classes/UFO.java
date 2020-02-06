@@ -16,7 +16,7 @@ public class UFO extends Invader {
     private int MAX_SPEED = 400;
     private float SPEED_INCREASE_FACTOR = 1.19f;
     private int SIZE_FACTOR = 24; // Tamaño de los invasores
-    public int SCORE_REWARD = 10;
+    public int SCORE_REWARD = 25;
     // Para alterar la frecuencia de los disparos
     private int CHANCE_NEAR = 150;
     private int CHANCE_FAR = 2000;

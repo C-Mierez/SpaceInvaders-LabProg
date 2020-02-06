@@ -9,6 +9,8 @@ public class Movement {
     public static final byte LEFT = 0x8;
     public static final byte DOWN_RIGHT = 0x6;
     public static final byte DOWN_LEFT = 0xC;
+    public static final byte UP_LEFT = 0x9;
+    public static final byte UP_RIGHT = 0x3;
 
     public static final byte TOP_BORDER = 1;
     public static final byte RIGHT_BORDER = 2;

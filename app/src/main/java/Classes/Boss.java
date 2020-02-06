@@ -13,10 +13,11 @@ public class Boss extends Invader {
 
     // Parametros configurables
     private int SPEED_FACTOR = 250;
+    private int PLAYER_MARGIN = 50;
     private int MAX_SPEED = 400;
     private float SPEED_INCREASE_FACTOR = 1.19f;
     private int SIZE_FACTOR = 8; // Tamaño de los invasores
-    public int SCORE_REWARD = 10;
+    public int SCORE_REWARD = 100;
     // Para alterar la frecuencia de los disparos
     private int CHANCE_NEAR = 90;
     private int CHANCE_FAR = 800;
@@ -85,8 +86,10 @@ public class Boss extends Invader {
         // Logica para cambiar el movimiento
         spaceshipX = GameView.spaceship.getPosX();
 
-        if (posY >= GameView.spaceship.getPosY() - GameView.spaceship.getHeight()) {
-            currentMovement = Movement.DOWN;
+        if (posY >= GameView.spaceship.getPosY() - GameView.spaceship.getHeight() - PLAYER_MARGIN) {
+            bottomBorderMovement();
+        }else if(posY <= screenY / 10){
+            topBorderMovement();
         }else{
             kamikazeMovement(spaceshipX);
         }
@@ -117,6 +120,46 @@ public class Boss extends Invader {
             }else{
                 currentMovement = Movement.DOWN;
             }
+        }
+    }
+
+    private void bottomBorderMovement(){
+        switch (randomGenerator.nextInt(5)){
+            case 0:
+                currentMovement = Movement.LEFT;
+                break;
+            case 1:
+                currentMovement = Movement.UP_LEFT;
+                break;
+            case 2:
+                currentMovement = Movement.UP;
+                break;
+            case 3:
+                currentMovement = Movement.UP_RIGHT;
+                break;
+            case 4:
+                currentMovement = Movement.RIGHT;
+                break;
+        }
+    }
+
+    private void topBorderMovement(){
+        switch (randomGenerator.nextInt(5)){
+            case 0:
+                currentMovement = Movement.LEFT;
+                break;
+            case 1:
+                currentMovement = Movement.DOWN_LEFT;
+                break;
+            case 2:
+                currentMovement = Movement.DOWN;
+                break;
+            case 3:
+                currentMovement = Movement.DOWN_RIGHT;
+                break;
+            case 4:
+                currentMovement = Movement.RIGHT;
+                break;
         }
     }
 }
