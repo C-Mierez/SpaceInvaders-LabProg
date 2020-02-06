@@ -42,6 +42,7 @@ public class GameView extends SurfaceView implements Runnable {
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
     private final int SCORE_TO_WIN = 30;
+    private final int LEVELS_FOR_BOSS = 2; // TODO Cambiar
 
     // Hilo del juego
     private Thread gameThread = null;
@@ -71,6 +72,8 @@ public class GameView extends SurfaceView implements Runnable {
     public static LinkedBlockingQueue<Entity> invaders;
     // Bloques de defensa
     public static LinkedBlockingQueue<DefenseBlock> defenseBlocks;
+    // Bosses
+    public static LinkedBlockingQueue<Boss> bosses;
 
     // Sonidos ( incializados por default)
     private SoundPool soundPool;
@@ -123,50 +126,12 @@ public class GameView extends SurfaceView implements Runnable {
         invaderAmount = STARTING_INVADER_AMOUNT;
         shelterAmount = SHELTER_DEFENSE_AMOUNT;
         currentLevel = 0;
-        //prepareLevel();
-    }
-
-    private void prepareLevel() {
-
-        // Crear la nave
         spaceship = new Spaceship(context);
-
-        // Crear el proyectil del Spaceship y los proyectiles de los enemigos
         spaceshipProjectile = new Projectile();
-
         invaderProjectiles = new LinkedBlockingQueue<>();
-        // Crear las filas de invasores al azar
         invaders = new LinkedBlockingQueue<>();
-        for (int i = 0; i < invaderAmount; i++) {
-            if(random.nextInt(5) > 1){ // Crear Crabs
-                invaders.add(new Crab(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
-            }else{ // Crear UFO
-                invaders.add(new UFO(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
-            }
-        }
-        // Crear bloques
-        defenseBlocks = new LinkedBlockingQueue<>();
-        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT);
-        for (int shelterNumber = 1; shelterNumber < shelterAmount; shelterNumber++) {
-            for (int i = 0; i < ROW_DEFENSE; i++) {
-                for (int x = 0; x < COLUMN_DEFENSE; x++) {
-                    if(random.nextInt(1000) > 300 * SHELTER_DECREASE_FACTOR){
-                        defenseBlocks.add(new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / shelterAmount, COLUMN_DEFENSE));
-                    }
-                }
-            }
-        }
-        // TODO Guardar score de rondas anteriores
-        currentScore = 0;
-        currentLives = STARTING_LIVES;
-
-        menaceInterval = STARTING_MENACE_INTERVAL;
-        lastMenaceTime = System.currentTimeMillis();
-        increaseSpeedCounter = 0;
-        // Para la siguiente ronda
-        invaderAmount *= INVADER_INCREASE_FACTOR;
-        currentLevel++;
-
+        bosses = new LinkedBlockingQueue<>();
+        //prepareLevel();
     }
 
     @Override
@@ -217,7 +182,7 @@ public class GameView extends SurfaceView implements Runnable {
         if (currentLives == 0) {
             lose();
         }
-        if (currentScore == SCORE_TO_WIN) {
+        if (invaders.isEmpty() && bosses.isEmpty()) {
             win();
         }
         // Actualizar las entidades (invasores, spaceship y proyectiles) activas
@@ -340,6 +305,11 @@ public class GameView extends SurfaceView implements Runnable {
         soundPool.play(soundID, 1, 1, 0, 0, 1);
     }
 
+    public static void destroySelfInvader(Invader invader){
+        invaders.remove(invader);
+        bosses.remove(invader);
+    }
+
     private void draw() {
         // Asegurar que la superficie a dibujar sea valida
         if (surfaceHolder.getSurface().isValid()) {
@@ -354,18 +324,16 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawBitmap(spaceship.getCurrentBitmap(), spaceship.getPosX(), spaceship.getPosY(), paint);
 
             // Dibujar los invasores
-            Bitmap[] bitmaps;
-            Bitmap b;
             for (Entity invader : invaders) {
                 if (invader != null && invader.isVisible()) {
-                    // TODO Hacerlo menos feo
-                    bitmaps = invader.getBitmap();
-                    if (uhOrOh) {
-                        b = bitmaps[0];
-                    } else {
-                        b = bitmaps[1];
-                    }
-                    canvas.drawBitmap(b, invader.getPosX(), invader.getPosY(), paint);
+                    invader.changeState();
+                    canvas.drawBitmap(invader.getCurrentBitmap(), invader.getPosX(), invader.getPosY(), paint);
+                }
+            }
+            // Dibujar los bosses
+            for(Boss boss : bosses){
+                if (boss != null && boss.isVisible()) {
+                    canvas.drawBitmap(boss.getCurrentBitmap(), boss.getPosX(), boss.getPosY(), paint);
                 }
             }
 
@@ -397,26 +365,97 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void win() {
         gamePaused = true;
-        spaceship.dead();
         draw();
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+        if(currentLevel % LEVELS_FOR_BOSS == 0){
+            prepareBossLevel();
+        }else{
+            prepareLevel();
         }
-        prepareLevel();
     }
 
     private void lose() {
         gamePaused = true;
-        spaceship.dead();
+        spaceship.changeState();
         draw();
-        try {
-            Thread.sleep(5000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    }
+
+    private void prepareLevel() {
+
+        // Posicionar la nave en el lugar adecuado
+        spaceship.setPosX((screenX / spaceship.STARTING_X_FACTOR) - (spaceship.width / 2));
+        spaceship.setPosY(screenY - (screenY / spaceship.STARTING_Y_FACTOR));
+
+        // Limpiar todos los proyectiles creados anteriormente
+        invaderProjectiles.clear();
+
+        // Crear las filas de invasores al azar
+        invaders = new LinkedBlockingQueue<>();
+        for (int i = 0; i < invaderAmount; i++) {
+            if(random.nextInt(5) > 1){ // Crear Crabs
+                invaders.add(new Crab(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+            }else{ // Crear UFO
+                invaders.add(new UFO(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+            }
         }
-        prepareLevel();
+        // Crear bloques
+        defenseBlocks = new LinkedBlockingQueue<>();
+        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT);
+        for (int shelterNumber = 1; shelterNumber < shelterAmount; shelterNumber++) {
+            for (int i = 0; i < ROW_DEFENSE; i++) {
+                for (int x = 0; x < COLUMN_DEFENSE; x++) {
+                    if(random.nextInt(1000) > 300 * SHELTER_DECREASE_FACTOR){
+                        defenseBlocks.add(new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / shelterAmount, COLUMN_DEFENSE));
+                    }
+                }
+            }
+        }
+        // TODO Guardar score de rondas anteriores
+        /*
+        currentScore = 0;
+        currentLives = STARTING_LIVES;
+        */
+        invaderAmount *= INVADER_INCREASE_FACTOR;
+        resetValues();
+    }
+
+    private void prepareBossLevel(){
+        // Posicionar la nave en el lugar adecuado
+        spaceship.setPosX((screenX / spaceship.STARTING_X_FACTOR) - (spaceship.width / 2));
+        spaceship.setPosY(screenY - (screenY / spaceship.STARTING_Y_FACTOR));
+
+        // Limpiar todos los proyectiles creados anteriormente
+        invaderProjectiles.clear();
+
+        // Crear las filas de invasores al azar
+        bosses = new LinkedBlockingQueue<>();
+        for (int i = 0; i < (currentLevel / LEVELS_FOR_BOSS); i++) {
+            bosses.add(new Boss(context, screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+        }
+        // Crear bloques
+        defenseBlocks = new LinkedBlockingQueue<>();
+        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT);
+        for (int shelterNumber = 1; shelterNumber < shelterAmount; shelterNumber++) {
+            for (int i = 0; i < ROW_DEFENSE; i++) {
+                for (int x = 0; x < COLUMN_DEFENSE; x++) {
+                    if(random.nextInt(1000) > 300 * SHELTER_DECREASE_FACTOR){
+                        defenseBlocks.add(new DefenseBlock(i, x, shelterNumber, screenY - (screenY / 8 * 2), screenX / shelterAmount, COLUMN_DEFENSE));
+                    }
+                }
+            }
+        }
+        // TODO Guardar score de rondas anteriores
+        /*
+        currentScore = 0;
+        */
+        currentLives = STARTING_LIVES + (currentLevel / LEVELS_FOR_BOSS);
+        resetValues();
+    }
+
+    private void resetValues(){
+        menaceInterval = STARTING_MENACE_INTERVAL;
+        lastMenaceTime = System.currentTimeMillis();
+        increaseSpeedCounter = 0;
+        currentLevel++;
     }
 
     public void pause() {

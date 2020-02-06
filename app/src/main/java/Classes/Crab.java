@@ -42,12 +42,14 @@ public class Crab extends Invader {
         posY = y;
 
         // Incializar bitmaps y escalarlos
-        bitmap = new Bitmap[3]; // TODO Agregar explosion
+        bitmapSize = 2;
+        bitmap = new Bitmap[bitmapSize]; // TODO Agregar explosion
         bitmap[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.invader1);
         bitmap[0] = Bitmap.createScaledBitmap(bitmap[0], (int) (width), (int) (height),false);
         bitmap[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.invader2);
         bitmap[1] = Bitmap.createScaledBitmap(bitmap[1], (int) (width), (int) (height),false);
-        currentBitmap = bitmap[0];
+        bitmapIndex = 0;
+        currentBitmap = bitmap[bitmapIndex];
     }
 
     public boolean tryShooting(float playerShipX, float playerShipWidth){

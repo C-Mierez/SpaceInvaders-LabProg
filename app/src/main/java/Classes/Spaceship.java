@@ -12,8 +12,9 @@ public class Spaceship extends Entity {
     // Algunos paramentros ajustables
     private final int SIZE_FACTOR = 22; // Tamaño de la nave
     private final int MOVEMENT_SPEED = 450;
-    private final int STARTING_X_FACTOR = 2;
-    private final int STARTING_Y_FACTOR = 12;
+    public final int STARTING_X_FACTOR = 2;
+    public final int STARTING_Y_FACTOR = 12;
+
 
     public Spaceship(Context context){
         rectF = new RectF();
@@ -29,7 +30,9 @@ public class Spaceship extends Entity {
         posY = screenY - (screenY / STARTING_Y_FACTOR);
 
         // Inicializar el Bitmap y ajustarlo a la pantalla
-        bitmap = new Bitmap[2]; // Cantidad de imagenes posibles
+        bitmapSize = 2;
+        bitmap = new Bitmap[bitmapSize]; // Cantidad de imagenes posibles
+
         // Nave normal
         bitmap[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.playership);
         bitmap[0] = Bitmap.createScaledBitmap(bitmap[0], (int)width, (int)height, false);
@@ -37,16 +40,13 @@ public class Spaceship extends Entity {
         bitmap[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.perdedor);
         bitmap[1] = Bitmap.createScaledBitmap(bitmap[1], (int)width, (int)height, false);
         // Bitmap inicial
-        currentBitmap = bitmap[0];
+        bitmapIndex = 0;
+        currentBitmap = bitmap[bitmapIndex];
 
         movementSpeed = MOVEMENT_SPEED;
         currentMovement = Movement.STOPPED;
 
         isVisible = true;
-    }
-
-    public void dead(){
-        currentBitmap = bitmap[1];
     }
 
     @Override

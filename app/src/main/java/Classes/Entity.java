@@ -10,6 +10,7 @@ public abstract class Entity {
 
     protected Bitmap bitmap[]; // Para representar la entidad
     protected Bitmap currentBitmap;
+    protected int bitmapIndex = 1, bitmapSize = 1;
 
     protected float height;
     protected float width;
@@ -47,6 +48,11 @@ public abstract class Entity {
         rectF.left = posX;
         rectF.right = posX + width;
     }
+    public void changeState(){
+        bitmapIndex = ++bitmapIndex % bitmapSize;
+        currentBitmap = bitmap[bitmapIndex];
+    }
+
 
     public RectF getRect() {
         return rectF;

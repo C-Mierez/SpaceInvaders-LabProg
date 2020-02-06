@@ -19,6 +19,7 @@ public abstract class Invader extends Entity{
                 break;
             case Movement.BOTTOM_BORDER:
                 setVisible(false);
+                GameView.destroySelfInvader(this);
                 break;
             case Movement.TOP_BORDER:
                 setVisible(false);
