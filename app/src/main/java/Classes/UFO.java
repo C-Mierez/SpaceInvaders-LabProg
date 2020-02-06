@@ -24,7 +24,6 @@ public class UFO extends Invader {
 
     Random randomGenerator = new Random();
 
-    boolean kamizazeMode;
 
     public UFO(Context context, int y) {
 
@@ -42,8 +41,6 @@ public class UFO extends Invader {
 
         posX = width + randomGenerator.nextInt( (int)(screenX - (width * 2)));
         posY = y;
-
-        kamizazeMode = false;
 
         // Incializar bitmaps y escalarlos
         bitmap = new Bitmap[3]; // TODO Agregar explosion
@@ -86,11 +83,22 @@ public class UFO extends Invader {
         // Logica para cambiar el movimiento
         spaceshipX = GameView.spaceship.getPosX();
 
-        // Modo kamikaze
+        if (posY >= GameView.spaceship.getPosY() - GameView.spaceship.getHeight()) {
+            currentMovement = Movement.DOWN;
+        }else{
+            kamikazeMovement(spaceshipX);
+        }
+
+        // Realizar el resto de acciones
+        super.update(fps);
+    }
+
+    private void kamikazeMovement(float spaceshipX){
+        // Modo kamikaze (Agrega el bit de movimiento hacia abajo)
         if((currentMovement & Movement.DOWN) == 0 && randomGenerator.nextInt(1000) < 10){
             currentMovement |= Movement.DOWN;
         }
-        // Si no se mueve hacia abajo (diagonal)
+        // Si se mueve hacia abajo (diagonal)
         if((currentMovement & Movement.DOWN) > 0){
             // Modificamos la direccion de movimiento horizontal segun el x de la nave con respecto al nuestro
             if(spaceshipX < posX){
@@ -98,21 +106,16 @@ public class UFO extends Invader {
                     currentMovement = Movement.DOWN_LEFT;
                 }else{
                     currentMovement = Movement.LEFT;
-                    kamizazeMode = false;
                 }
             }else if (spaceshipX > posX){
                 if(spaceshipX - posX < 3 * width){
                     currentMovement = Movement.DOWN_RIGHT;
                 }else{
                     currentMovement = Movement.RIGHT;
-                    kamizazeMode = false;
                 }
             }else{
                 currentMovement = Movement.DOWN;
             }
         }
-
-        // Realizar el resto de acciones
-        super.update(fps);
     }
 }

@@ -17,13 +17,13 @@ public class Movement {
 
     public static void updateMovement(Entity entity, long fps){
 
-        if((entity.getCurrentMovement() & UP) > 0 && entity.getPosY() - entity.getHeight() >= 0){
+        if((entity.getCurrentMovement() & UP) > 0 && entity.getPosY() >= 0){
             entity.setPosY(entity.getPosY() - entity.getMovementSpeed() / fps);
             if(entity.getPosY() < 0){
                 entity.borderCollision(TOP_BORDER);
             }
         }
-        if((entity.getCurrentMovement() & DOWN) > 0 && entity.getPosY() <= GameView.screenY){
+        if((entity.getCurrentMovement() & DOWN) > 0 && entity.getPosY() - entity.getHeight() <= GameView.screenY){
             entity.setPosY(entity.getPosY() + entity.getMovementSpeed() / fps);
             if(entity.getPosY() - entity.getHeight() > GameView.screenY){
                 entity.borderCollision(BOTTOM_BORDER);
