@@ -7,6 +7,8 @@ public class Movement {
     public static final byte RIGHT = 0x2;
     public static final byte DOWN = 0x4;
     public static final byte LEFT = 0x8;
+    public static final byte DOWN_RIGHT = 0x6;
+    public static final byte DOWN_LEFT = 0x12;
 
     public static void updateMovement(Entity entity, long fps){
 

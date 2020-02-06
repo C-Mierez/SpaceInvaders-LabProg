@@ -91,4 +91,12 @@ public class UFO extends Entity implements Invader {
     public int getScoreReward(){
         return SCORE_REWARD;
     }
+
+    @Override
+    public void update(long fps){
+        // Logica para cambiar el movimiento
+
+        // Realizar el resto de acciones
+        super.update(fps);
+    }
 }
