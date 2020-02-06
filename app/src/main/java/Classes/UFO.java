@@ -36,7 +36,7 @@ public class UFO extends Entity implements Invader {
 
         isVisible = true;
         movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
-        currentMovement = Movement.LEFT;
+        currentMovement = Movement.STOPPED;
 
         posX = width + randomGenerator.nextInt( (int)(screenX - (width * 2)));
         posY = y;
@@ -94,7 +94,25 @@ public class UFO extends Entity implements Invader {
 
     @Override
     public void update(long fps){
+        float spaceshipX;
         // Logica para cambiar el movimiento
+        spaceshipX = GameView.spaceship.getPosX();
+
+        // Modo kamikaze
+        if(randomGenerator.nextInt(1000) < 50){
+            currentMovement |= Movement.DOWN;
+        }
+        // Si no se mueve hacia abajo (diagonal)
+        if((currentMovement & Movement.DOWN) > 0){
+            // Modificamos la direccion de movimiento horizontal segun el x de la nave con respecto al nuestro
+            if(spaceshipX < posX){
+                currentMovement = Movement.DOWN_LEFT;
+            }else if (spaceshipX > posX){
+                currentMovement = Movement.DOWN_RIGHT;
+            }else{
+                currentMovement = Movement.DOWN;
+            }
+        }
 
         // Realizar el resto de acciones
         super.update(fps);

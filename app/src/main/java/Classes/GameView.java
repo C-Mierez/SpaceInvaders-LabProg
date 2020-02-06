@@ -61,7 +61,7 @@ public class GameView extends SurfaceView implements Runnable {
     public static int screenY;
 
     // Nave del jugador
-    private Spaceship spaceship;
+    public static Spaceship spaceship;
     // Proyectil del jugador
     private Projectile spaceshipProjectile;
 
