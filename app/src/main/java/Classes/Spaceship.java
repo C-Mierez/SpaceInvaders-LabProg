@@ -11,7 +11,7 @@ public class Spaceship extends Entity {
 
     // Algunos paramentros ajustables
     private final int SIZE_FACTOR = 22; // Tamaño de la nave
-    private final int MOVEMENT_SPEED = 450;
+    private final int MOVEMENT_SPEED = 600;
     public final int STARTING_X_FACTOR = 2;
     public final int STARTING_Y_FACTOR = 12;
 

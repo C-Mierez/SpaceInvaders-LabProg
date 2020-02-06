@@ -13,13 +13,12 @@ public class Boss extends Invader {
 
     // Parametros configurables
     private int SPEED_FACTOR = 250;
-    private int PLAYER_MARGIN = 50;
     private int MAX_SPEED = 400;
     private float SPEED_INCREASE_FACTOR = 1.19f;
     private int SIZE_FACTOR = 8; // Tamaño de los invasores
     public int SCORE_REWARD = 100;
     // Para alterar la frecuencia de los disparos
-    private int CHANCE_NEAR = 90;
+    private int CHANCE_NEAR = 20;
     private int CHANCE_FAR = 800;
 
 
@@ -86,9 +85,9 @@ public class Boss extends Invader {
         // Logica para cambiar el movimiento
         spaceshipX = GameView.spaceship.getPosX();
 
-        if (posY >= GameView.spaceship.getPosY() - GameView.spaceship.getHeight() - PLAYER_MARGIN) {
+        if (posY + height >= GameView.spaceship.getPosY() - GameView.spaceship.getHeight()) {
             bottomBorderMovement();
-        }else if(posY <= screenY / 10){
+        }else if(posY - height <= screenY / 10){
             topBorderMovement();
         }else{
             kamikazeMovement(spaceshipX);
@@ -99,7 +98,7 @@ public class Boss extends Invader {
 
     private void kamikazeMovement(float spaceshipX){
         // Modo kamikaze (Agrega el bit de movimiento hacia abajo)
-        if((currentMovement & Movement.DOWN) == 0 && randomGenerator.nextInt(1000) < 10){
+        if((currentMovement & Movement.DOWN) == 0 && randomGenerator.nextInt(8000) < 10){
             currentMovement |= Movement.DOWN;
         }
         // Si se mueve hacia abajo (diagonal)
