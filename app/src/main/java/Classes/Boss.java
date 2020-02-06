@@ -18,8 +18,8 @@ public class Boss extends Invader {
     private int SIZE_FACTOR = 8; // Tamaño de los invasores
     public int SCORE_REWARD = 10;
     // Para alterar la frecuencia de los disparos
-    private int CHANCE_NEAR = 150;
-    private int CHANCE_FAR = 2000;
+    private int CHANCE_NEAR = 90;
+    private int CHANCE_FAR = 800;
 
 
     Random randomGenerator = new Random();
@@ -40,7 +40,7 @@ public class Boss extends Invader {
         currentMovement = Movement.RIGHT;
 
         // TODO posX = width + randomGenerator.nextInt( (int)(screenX - (width * 2)));
-        posX = screenX / 2;
+        posX = (screenX / 2) - (width / 2);
         posY = y;
 
         // Incializar bitmaps y escalarlos
@@ -70,7 +70,8 @@ public class Boss extends Invader {
 
 
     public void shoot(){
-        GameView.invaderProjectiles.add(new Projectile(posX + width / 2, posY, Movement.DOWN));
+        GameView.invaderProjectiles.add(new Projectile(posX + (width / 3), posY, Movement.DOWN));
+        GameView.invaderProjectiles.add(new Projectile(posX + (width / 3) * 2, posY, Movement.DOWN));
     }
 
     @Override

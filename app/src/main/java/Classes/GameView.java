@@ -42,7 +42,7 @@ public class GameView extends SurfaceView implements Runnable {
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
     private final int SCORE_TO_WIN = 30;
-    private final int LEVELS_FOR_BOSS = 2; // TODO Cambiar
+    private final int LEVELS_FOR_BOSS = 1; // TODO Cambiar
 
     // Hilo del juego
     private Thread gameThread = null;
@@ -186,8 +186,6 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
     private void update() {
-        // Vidas del jugador terminadas
-
         // Actualizar las entidades (invasores, spaceship y proyectiles) activas
         updateEntities();
         // Comprobar si hay colisiones
@@ -208,6 +206,14 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
+        for (Entity boss : bosses) {
+            if (boss.isVisible()) {
+                if (RectF.intersects(boss.getRect(), spaceship.getRect())) {
+                    // TODO Perdida
+                    lose();
+                }
+            }
+        }
         // TODO Colision de invasor con bloques
         for (Entity invader : invaders) {
             if (invader.isVisible()) {
@@ -221,12 +227,33 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
+        for (Entity boss : bosses) {
+            if (boss.isVisible()) {
+                for (DefenseBlock block : defenseBlocks) {
+                    if (block != null && block.isVisible()) {
+                        if (RectF.intersects(boss.getRect(), block.getRect())) {
+                            block.setVisible(false);
+                            // soundPool.play(damageShelterID, 1,1,0,0,1);
+                        }
+                    }
+                }
+            }
+        }
         // Colision del proyectil con un invasor
         if (spaceshipProjectile.isVisible()) {
             for (Entity invader : invaders) {
                 if (invader.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), invader.getRect())) {
                         destroyEntities(invader, spaceshipProjectile, true, invaderExplodeID);
+                    }
+                }
+            }
+        }
+        if (spaceshipProjectile.isVisible()) {
+            for (Entity boss : bosses) {
+                if (boss.isVisible()) {
+                    if (RectF.intersects(spaceshipProjectile.getRect(), boss.getRect())) {
+                        destroyEntities(boss, spaceshipProjectile, true, invaderExplodeID);
                     }
                 }
             }
@@ -273,7 +300,7 @@ public class GameView extends SurfaceView implements Runnable {
         // Mover el Spaceship
         spaceship.update(fps);
 
-        // Colision con el borde la pantalla
+        // Actualizar invasores
         for (Entity invader : invaders) {
             if (invader.isVisible()) {
                 invader.update(fps);
@@ -283,6 +310,17 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
+
+        // Actualizar bosses
+        for(Boss boss : bosses){
+            if(boss.isVisible()){
+                boss.update(fps);
+            }
+            if (boss.tryShooting(spaceship.getPosX(), spaceship.getWidth())) {
+                boss.shoot();
+            }
+        }
+
         // Actualizar los proyectiles activos de los Invasores
         for (Projectile projectile : invaderProjectiles) {
             if (projectile != null && projectile.isVisible()) {
