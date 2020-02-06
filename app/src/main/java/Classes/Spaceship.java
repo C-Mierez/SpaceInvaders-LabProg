@@ -50,11 +50,11 @@ public class Spaceship extends Entity {
     }
 
     @Override
-    protected void borderCollision() {
-        if((currentMovement & Movement.LEFT) > 0){
+    protected void borderCollision(byte border) {
+        if(border == Movement.LEFT_BORDER){
             posX = 0;
         }
-        if((currentMovement & Movement.RIGHT) > 0){
+        if(border == Movement.RIGHT_BORDER){
             posX = screenX - width;
         }
         currentMovement = Movement.STOPPED;

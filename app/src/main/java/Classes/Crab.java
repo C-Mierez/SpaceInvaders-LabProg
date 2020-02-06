@@ -9,11 +9,11 @@ import com.example.spaceinvaders_labprogramacion.R;
 
 import java.util.Random;
 
-public class Crab extends Entity implements Invader {
+public class Crab extends Invader {
 
     // Parametros configurables
-    private int SPEED_FACTOR = 50;
-    private int MAX_SPEED = 200;
+    private int SPEED_FACTOR = 100;
+    private int MAX_SPEED = 300;
     private float SPEED_INCREASE_FACTOR = 1.19f;
     private int SIZE_FACTOR = 26; // Tamaño de los invasores
     public int SCORE_REWARD = 10;
@@ -67,15 +67,13 @@ public class Crab extends Entity implements Invader {
     }
 
     @Override
-    public void borderCollision() {
-        if((currentMovement & Movement.LEFT) > 0){
-            currentMovement = Movement.RIGHT;
-        }else{ // TODO Esto no es valido si hay movimiento en diagonal
-            currentMovement = Movement.LEFT;
-        }
-
-        // TODO Velocidad de decenso de los invasores
+    public void borderCollision(byte border) {
+        super.borderCollision(border);
         posY += height;
+        increaseMovementSpeed();
+    }
+
+    private void increaseMovementSpeed(){
         if(movementSpeed * SPEED_INCREASE_FACTOR <= MAX_SPEED){
             movementSpeed *= SPEED_INCREASE_FACTOR;
         }else{

@@ -37,7 +37,7 @@ public class DefenseBlock extends Entity {
     }
 
     @Override
-    protected void borderCollision() {
+    protected void borderCollision(byte border) {
         // :)
     }
 

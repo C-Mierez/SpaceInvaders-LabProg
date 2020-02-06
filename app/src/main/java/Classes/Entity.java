@@ -24,7 +24,7 @@ public abstract class Entity {
     protected byte currentMovement;
     protected int movementSpeed;
 
-    protected abstract void borderCollision();
+    protected abstract void borderCollision(byte border);
 
     protected void update(long fps){
         Movement.updateMovement(this, fps);

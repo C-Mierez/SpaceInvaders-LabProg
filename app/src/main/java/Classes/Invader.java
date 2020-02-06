@@ -1,13 +1,29 @@
 package Classes;
 
-public interface Invader{
+public abstract class Invader extends Entity{
 
-    public boolean tryShooting(float playershipX, float playershipWdith);
+    public abstract boolean tryShooting(float playershipX, float playershipWdith);
 
-    public void borderCollision();
+    public abstract void shoot();
 
-    public void shoot();
+    public abstract int getScoreReward();
 
-    public int getScoreReward();
+    public void borderCollision(byte border) {
+        // Colision con los bordes
+        switch (border){
+            case Movement.LEFT_BORDER:
+                currentMovement = Movement.RIGHT;
+                break;
+            case Movement.RIGHT_BORDER:
+                currentMovement = Movement.LEFT;
+                break;
+            case Movement.BOTTOM_BORDER:
+                setVisible(false);
+                break;
+            case Movement.TOP_BORDER:
+                setVisible(false);
+                break;
+        }
+    }
 
 }

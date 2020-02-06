@@ -9,11 +9,11 @@ import com.example.spaceinvaders_labprogramacion.R;
 
 import java.util.Random;
 
-public class UFO extends Entity implements Invader {
+public class UFO extends Invader {
 
     // Parametros configurables
-    private int SPEED_FACTOR = 50;
-    private int MAX_SPEED = 200;
+    private int SPEED_FACTOR = 100;
+    private int MAX_SPEED = 400;
     private float SPEED_INCREASE_FACTOR = 1.19f;
     private int SIZE_FACTOR = 18; // Tamaño de los invasores
     public int SCORE_REWARD = 10;
@@ -70,22 +70,6 @@ public class UFO extends Entity implements Invader {
         return shoot;
     }
 
-    @Override
-    public void borderCollision() {
-        if((currentMovement & Movement.LEFT) > 0){
-            currentMovement = Movement.RIGHT;
-        }else{ // TODO Esto no es valido si hay movimiento en diagonal
-            currentMovement = Movement.LEFT;
-        }
-
-        // TODO Velocidad de decenso de los invasores
-        posY += height;
-        if(movementSpeed * SPEED_INCREASE_FACTOR <= MAX_SPEED){
-            movementSpeed *= SPEED_INCREASE_FACTOR;
-        }else{
-            movementSpeed = MAX_SPEED;
-        }
-    }
 
     public void shoot(){
         GameView.invaderProjectiles.add(new Projectile(posX + width / 2, posY, Movement.DOWN));
@@ -103,12 +87,11 @@ public class UFO extends Entity implements Invader {
         spaceshipX = GameView.spaceship.getPosX();
 
         // Modo kamikaze
-        if(!kamizazeMode && randomGenerator.nextInt(1000) < 10){
+        if((currentMovement & Movement.DOWN) == 0 && randomGenerator.nextInt(1000) < 10){
             currentMovement |= Movement.DOWN;
-            kamizazeMode = true;
         }
         // Si no se mueve hacia abajo (diagonal)
-        if(kamizazeMode){
+        if((currentMovement & Movement.DOWN) > 0){
             // Modificamos la direccion de movimiento horizontal segun el x de la nave con respecto al nuestro
             if(spaceshipX < posX){
                 if(posX - spaceshipX < 3 * width){
