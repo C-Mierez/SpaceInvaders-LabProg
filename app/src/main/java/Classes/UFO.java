@@ -15,7 +15,7 @@ public class UFO extends Invader {
     private int SPEED_FACTOR = 100;
     private int MAX_SPEED = 400;
     private float SPEED_INCREASE_FACTOR = 1.19f;
-    private int SIZE_FACTOR = 18; // Tamaño de los invasores
+    private int SIZE_FACTOR = 24; // Tamaño de los invasores
     public int SCORE_REWARD = 10;
     // Para alterar la frecuencia de los disparos
     private int CHANCE_NEAR = 150;
@@ -44,9 +44,9 @@ public class UFO extends Invader {
 
         // Incializar bitmaps y escalarlos
         bitmap = new Bitmap[3]; // TODO Agregar explosion
-        bitmap[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ufo);
+        bitmap[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ufo_better);
         bitmap[0] = Bitmap.createScaledBitmap(bitmap[0], (int) (width), (int) (height),false);
-        bitmap[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ufo);
+        bitmap[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ufo_better);
         bitmap[1] = Bitmap.createScaledBitmap(bitmap[0], (int) (width), (int) (height),false);
         currentBitmap = bitmap[0];
     }
@@ -88,7 +88,6 @@ public class UFO extends Invader {
         }else{
             kamikazeMovement(spaceshipX);
         }
-
         // Realizar el resto de acciones
         super.update(fps);
     }
