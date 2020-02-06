@@ -24,6 +24,8 @@ public class UFO extends Entity implements Invader {
 
     Random randomGenerator = new Random();
 
+    boolean kamizazeMode;
+
     public UFO(Context context, int y) {
 
         rectF = new RectF();
@@ -40,6 +42,8 @@ public class UFO extends Entity implements Invader {
 
         posX = width + randomGenerator.nextInt( (int)(screenX - (width * 2)));
         posY = y;
+
+        kamizazeMode = false;
 
         // Incializar bitmaps y escalarlos
         bitmap = new Bitmap[3]; // TODO Agregar explosion
@@ -99,11 +103,12 @@ public class UFO extends Entity implements Invader {
         spaceshipX = GameView.spaceship.getPosX();
 
         // Modo kamikaze
-        if(randomGenerator.nextInt(1000) < 50){
+        if(!kamizazeMode && randomGenerator.nextInt(1000) < 10){
             currentMovement |= Movement.DOWN;
+            kamizazeMode = true;
         }
         // Si no se mueve hacia abajo (diagonal)
-        if((currentMovement & Movement.DOWN) > 0){
+        if(kamizazeMode){
             // Modificamos la direccion de movimiento horizontal segun el x de la nave con respecto al nuestro
             if(spaceshipX < posX){
                 currentMovement = Movement.DOWN_LEFT;

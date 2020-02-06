@@ -346,7 +346,8 @@ public class GameView extends SurfaceView implements Runnable {
             // Bloquear el canvas
             canvas = surfaceHolder.lockCanvas();
             // Dibujar color de fondo
-            canvas.drawColor(Color.argb(255, 26, 128, 182));
+            // canvas.drawColor(Color.argb(255, 26, 128, 182));
+            canvas.drawColor(Color.argb(255, 10, 10, 10));
             paint.setColor(Color.argb(255, 255, 255, 255));
 
             // Dibujar el spaceship
