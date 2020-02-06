@@ -46,8 +46,8 @@ public class UFO extends Invader {
         bitmap = new Bitmap[3]; // TODO Agregar explosion
         bitmap[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ufo_better);
         bitmap[0] = Bitmap.createScaledBitmap(bitmap[0], (int) (width), (int) (height),false);
-        bitmap[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ufo_better);
-        bitmap[1] = Bitmap.createScaledBitmap(bitmap[0], (int) (width), (int) (height),false);
+        bitmap[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ufo_better2);
+        bitmap[1] = Bitmap.createScaledBitmap(bitmap[1], (int) (width), (int) (height),false);
         currentBitmap = bitmap[0];
     }
 

@@ -126,6 +126,8 @@ public class GameView extends SurfaceView implements Runnable {
         invaderAmount = STARTING_INVADER_AMOUNT;
         shelterAmount = SHELTER_DEFENSE_AMOUNT;
         currentLevel = 0;
+        currentScore = 0;
+        currentLives = STARTING_LIVES;
         spaceship = new Spaceship(context);
         spaceshipProjectile = new Projectile();
         invaderProjectiles = new LinkedBlockingQueue<>();
@@ -154,6 +156,12 @@ public class GameView extends SurfaceView implements Runnable {
             // Sonidito uUrUURuoogogo UWU
             if (!gamePaused) {
                 increaseSpeed(startFrameTime);
+                if (currentLives == 0) {
+                    lose();
+                }
+                if (invaders.isEmpty() && bosses.isEmpty()) {
+                    win();
+                }
             }
         }
     }
@@ -179,12 +187,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void update() {
         // Vidas del jugador terminadas
-        if (currentLives == 0) {
-            lose();
-        }
-        if (invaders.isEmpty() && bosses.isEmpty()) {
-            win();
-        }
+
         // Actualizar las entidades (invasores, spaceship y proyectiles) activas
         updateEntities();
         // Comprobar si hay colisiones
@@ -297,7 +300,9 @@ public class GameView extends SurfaceView implements Runnable {
 
     private void destroyEntities(Entity entity, Entity entity2, boolean gainScore, int soundID) {
         entity.setVisible(false);
+        destroySelfInvader(entity);
         entity2.setVisible(false);
+        destroySelfInvader(entity2);
         if (gainScore) {
             currentScore += (entity.getScoreReward() + entity2.getScoreReward()) * SCORE_FACTOR;
         }
@@ -305,7 +310,7 @@ public class GameView extends SurfaceView implements Runnable {
         soundPool.play(soundID, 1, 1, 0, 0, 1);
     }
 
-    public static void destroySelfInvader(Invader invader){
+    public static void destroySelfInvader(Entity invader){
         invaders.remove(invader);
         bosses.remove(invader);
     }
@@ -326,8 +331,11 @@ public class GameView extends SurfaceView implements Runnable {
             // Dibujar los invasores
             for (Entity invader : invaders) {
                 if (invader != null && invader.isVisible()) {
-                    invader.changeState();
-                    canvas.drawBitmap(invader.getCurrentBitmap(), invader.getPosX(), invader.getPosY(), paint);
+                        if (uhOrOh) {
+                            canvas.drawBitmap(invader.getBitmap()[0], invader.getPosX(), invader.getPosY(), paint);
+                        } else {
+                            canvas.drawBitmap(invader.getBitmap()[1], invader.getPosX(), invader.getPosY(), paint);
+                        }
                 }
             }
             // Dibujar los bosses
@@ -369,13 +377,16 @@ public class GameView extends SurfaceView implements Runnable {
         if(currentLevel % LEVELS_FOR_BOSS == 0){
             prepareBossLevel();
         }else{
+            if((currentLevel - 1) % LEVELS_FOR_BOSS == 0){
+                currentLives = STARTING_LIVES + (currentLevel / LEVELS_FOR_BOSS);
+            }
             prepareLevel();
         }
     }
 
     private void lose() {
         gamePaused = true;
-        spaceship.changeState();
+        spaceship.setCurrentBitmap(spaceship.getBitmap()[1]);
         draw();
     }
 
@@ -447,7 +458,6 @@ public class GameView extends SurfaceView implements Runnable {
         /*
         currentScore = 0;
         */
-        currentLives = STARTING_LIVES + (currentLevel / LEVELS_FOR_BOSS);
         resetValues();
     }
 

@@ -48,10 +48,6 @@ public abstract class Entity {
         rectF.left = posX;
         rectF.right = posX + width;
     }
-    public void changeState(){
-        bitmapIndex = ++bitmapIndex % bitmapSize;
-        currentBitmap = bitmap[bitmapIndex];
-    }
 
 
     public RectF getRect() {
