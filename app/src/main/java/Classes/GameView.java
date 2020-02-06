@@ -41,7 +41,7 @@ public class GameView extends SurfaceView implements Runnable {
     private final int MIN_MENACE_INTERVAL = 240;
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
-    private final int SCORE_TO_WIN = 30;
+    private final int SCORE_TO_WIN = 60;
 
     // Hilo del juego
     private Thread gameThread = null;
@@ -138,7 +138,11 @@ public class GameView extends SurfaceView implements Runnable {
         // Crear las filas de invasores al azar
         invaders = new LinkedBlockingQueue<>();
         for (int i = 0; i < invaderAmount; i++) {
-            invaders.add(new UFO(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+            if(random.nextInt(5) > 1){ // Crear Crabs
+                invaders.add(new Crab(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+            }else{ // Crear UFO
+                invaders.add(new UFO(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+            }
         }
         // Crear bloques
         defenseBlocks = new LinkedBlockingQueue<>();

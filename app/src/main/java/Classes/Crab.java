@@ -52,7 +52,7 @@ public class Crab extends Entity implements Invader {
 
     public boolean tryShooting(float playerShipX, float playerShipWidth){
         int randomNumber;
-        boolean shoot = false;
+        boolean shoot;
         // Si se esta cerca del jugador
         if((playerShipX + playerShipWidth > posX && playerShipX + playerShipWidth < posX + width) || (playerShipX > posX && playerShipX < posX + width)) {
             // Posibilidad de disparar  cuando esta cerca

@@ -68,7 +68,7 @@ public class Projectile extends Entity{
 
     @Override
     protected void borderCollision() {
-        isVisible = false;
+        setVisible(false);
         GameView.invaderProjectiles.remove(this);
     }
 }

@@ -28,14 +28,24 @@ public abstract class Entity {
 
     protected void update(long fps){
         Movement.updateMovement(this, fps);
-        rectF.top = posY;
-        rectF.bottom = posY + height;
-        rectF.left = posX;
-        rectF.right = posX + width;
+        updateRectF();
     }
 
     public int getScoreReward(){
         return 0;
+    }
+
+    private void resetPosition(){
+        posX = 0;
+        posY = 0;
+        updateRectF();
+    }
+
+    private void updateRectF(){
+        rectF.top = posY;
+        rectF.bottom = posY + height;
+        rectF.left = posX;
+        rectF.right = posX + width;
     }
 
     public RectF getRect() {
@@ -92,6 +102,9 @@ public abstract class Entity {
 
     public void setVisible(boolean visible) {
         isVisible = visible;
+        if(!isVisible){
+            resetPosition();
+        }
     }
 
     public byte getCurrentMovement() {

@@ -52,7 +52,7 @@ public class UFO extends Entity implements Invader {
 
     public boolean tryShooting(float playerShipX, float playerShipLength){
         int randomNumber;
-        boolean shoot = false;
+        boolean shoot;
         // Si se esta cerca del jugador
         if((playerShipX + playerShipLength > posX && playerShipX + playerShipLength < posX + width) || (playerShipX > posX && playerShipX < posX + width)) {
             // Posibilidad de disparar  cuando esta cerca
