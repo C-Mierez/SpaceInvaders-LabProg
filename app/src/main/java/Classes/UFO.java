@@ -38,7 +38,7 @@ public class UFO extends Entity implements Invader {
 
         isVisible = true;
         movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
-        currentMovement = Movement.STOPPED;
+        currentMovement = Movement.RIGHT;
 
         posX = width + randomGenerator.nextInt( (int)(screenX - (width * 2)));
         posY = y;
@@ -111,9 +111,19 @@ public class UFO extends Entity implements Invader {
         if(kamizazeMode){
             // Modificamos la direccion de movimiento horizontal segun el x de la nave con respecto al nuestro
             if(spaceshipX < posX){
-                currentMovement = Movement.DOWN_LEFT;
+                if(posX - spaceshipX < 3 * width){
+                    currentMovement = Movement.DOWN_LEFT;
+                }else{
+                    currentMovement = Movement.LEFT;
+                    kamizazeMode = false;
+                }
             }else if (spaceshipX > posX){
-                currentMovement = Movement.DOWN_RIGHT;
+                if(spaceshipX - posX < 3 * width){
+                    currentMovement = Movement.DOWN_RIGHT;
+                }else{
+                    currentMovement = Movement.RIGHT;
+                    kamizazeMode = false;
+                }
             }else{
                 currentMovement = Movement.DOWN;
             }
