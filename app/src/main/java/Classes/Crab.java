@@ -30,7 +30,32 @@ public class Crab extends Invader {
                     BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.invader2),};
     int animationIndex = 1;
 
-    public Crab(Context context, int y) {
+    public Crab(float x, float y) {
+
+        rectF = new RectF();
+
+        screenX = GameView.screenX;
+        screenY = GameView.screenY;
+
+        width  = screenX / SIZE_FACTOR;
+        height = screenY / SIZE_FACTOR;
+
+        isVisible = true;
+        movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
+        currentMovement = Movement.LEFT;
+        currentLives = STARTING_LIVES;
+
+        posX = x;
+        posY = y;
+
+        // Incializar bitmaps y escalarlos
+        bitmapSize = 2;
+        bitmap = new Bitmap[bitmapSize]; // TODO Agregar explosion
+        bitmapIndex = 0;
+        currentBitmap = Bitmap.createScaledBitmap(invaderDamage[bitmapIndex], (int) (width), (int) (height),false);
+    }
+
+    public Crab(int y) {
 
         rectF = new RectF();
 

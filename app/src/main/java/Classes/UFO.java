@@ -33,7 +33,31 @@ public class UFO extends Invader {
     int animationIndex = 2; // Cuantos estados hay por cada tipo
 
 
-    public UFO(Context context, int y) {
+    public UFO(float x, float y) {
+
+        rectF = new RectF();
+
+        screenX = GameView.screenX;
+        screenY = GameView.screenY;
+
+        width  = screenX / SIZE_FACTOR;
+        height = screenY / SIZE_FACTOR;
+
+        isVisible = true;
+        movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
+        currentMovement = Movement.RIGHT;
+
+        posX = x;
+        posY = y;
+
+        currentLives = STARTING_LIVES;
+
+        // Incializar bitmaps y escalarlos
+        bitmap = new Bitmap[3]; // TODO Agregar explosion
+        bitmapIndex = 0;
+        currentBitmap = Bitmap.createScaledBitmap(invaderDamage[bitmapIndex], (int) (width), (int) (height),false);
+    }
+    public UFO(int y) {
 
         rectF = new RectF();
 

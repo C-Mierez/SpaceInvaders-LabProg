@@ -26,8 +26,6 @@ public class GameView extends SurfaceView implements Runnable {
     // Algunos parametros
     private final int INPUT_PLAYER_MOVEMENT_FACTOR = 8;
     private final int BAR_PADDING_FACTOR = 10;
-    private final int ROW_INVADERS = 4;
-    private final int COLUMN_INVADERS = 6; // Se crean 1 menos que el numero
     private final int ROW_DEFENSE = 4;
     private final int COLUMN_DEFENSE = 8;
     private final int SHELTER_DEFENSE_AMOUNT = 5; // Se crean 1 menos que el numero
@@ -41,7 +39,6 @@ public class GameView extends SurfaceView implements Runnable {
     private final int MIN_MENACE_INTERVAL = 240;
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
-    private final int SCORE_TO_WIN = 30;
     private final int LEVELS_FOR_BOSS = 3; // TODO Cambiar
     private final int STARTING_LIVES = 3;
     private final int STARTING_MENACE_INTERVAL = 1000;
@@ -78,13 +75,14 @@ public class GameView extends SurfaceView implements Runnable {
     public static LinkedBlockingQueue<Boss> bosses;
 
     // Sonidos ( incializados por default)
-    private SoundPool soundPool;
+    public static SoundPool soundPool;
     private int playerExplodeID = -1;
     private int invaderExplodeID = -1;
     private int shootID = -1;
     private int damageShelterID = -1;
     private int uhID = -1;
     private int ohID = -1;
+    public static int evilLaughID = -1;
     // Sonido en intervalo
     private long menaceInterval;
     private boolean uhOrOh;
@@ -121,6 +119,7 @@ public class GameView extends SurfaceView implements Runnable {
             playerExplodeID = soundPool.load(context, R.raw.playerexplode, 1);
             uhID = soundPool.load(context, R.raw.uh, 1);
             ohID = soundPool.load(context, R.raw.oh, 1);
+            evilLaughID = soundPool.load(context,R.raw.evil_laugh,1);
 
         } catch (Exception e) {
             Log.e("error", "Error al cargar los sonidos.");
@@ -461,9 +460,9 @@ public class GameView extends SurfaceView implements Runnable {
         invaders = new LinkedBlockingQueue<>();
         for (int i = 0; i < invaderAmount; i++) {
             if(random.nextInt(100) > UFO_CHANCE * UFO_CHANCE_FACTOR){ // Crear Crabs
-                invaders.add(new Crab(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+                invaders.add(new Crab( screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
             }else{ // Crear UFO
-                invaders.add(new UFO(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+                invaders.add(new UFO(screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
             }
         }
         // Crear bloques
@@ -502,10 +501,10 @@ public class GameView extends SurfaceView implements Runnable {
         // Limpiar todos los proyectiles creados anteriormente
         invaderProjectiles.clear();
 
-        // Crear las filas de invasores al azar
+        // Crear los bosses
         bosses = new LinkedBlockingQueue<>();
         for (int i = 0; i < (currentLevel / LEVELS_FOR_BOSS); i++) {
-            bosses.add(new Boss(context, screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
+            bosses.add(new Boss(screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
         }
         // Crear bloques
         defenseBlocks = new LinkedBlockingQueue<>();

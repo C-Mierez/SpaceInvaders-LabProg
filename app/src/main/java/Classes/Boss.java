@@ -39,7 +39,7 @@ public class Boss extends Invader {
     int animationIndex = 5; // Cuantos estados hay por cada tipo (Boss / Boss2 en este caso ^)
 
 
-    public Boss(Context context, int y) {
+    public Boss(int y) {
 
         rectF = new RectF();
 
@@ -101,6 +101,15 @@ public class Boss extends Invader {
             GameView.invaderProjectiles.add(new Projectile(posX + (width / 4), posY + (height/3), Movement.DOWN));
             GameView.invaderProjectiles.add(new Projectile(posX + (width / 2), posY + (height/2), Movement.DOWN));
             GameView.invaderProjectiles.add(new Projectile(posX + (width / 4) * 3, posY + (height/3), Movement.DOWN));
+        }
+        if(randomGenerator.nextInt(10) < 1){
+            if(randomGenerator.nextInt(2) == 0){
+                GameView.invaders.add(new UFO(posX + width/2, posY - height));
+            } else{
+                GameView.invaders.add(new Crab(posX + width/2, posY - height));
+            }
+            // TODO esto esta feo
+            GameView.soundPool.play(GameView.evilLaughID, 1,1,1,0,1);
         }
     }
 
