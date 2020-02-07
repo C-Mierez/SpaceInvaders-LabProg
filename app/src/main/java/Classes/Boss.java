@@ -12,19 +12,31 @@ import java.util.Random;
 public class Boss extends Invader {
 
     // Parametros configurables
-    private final int SPEED_FACTOR = 250;
-    private final int STARTING_LIVES = 3;
+    private final int SPEED_FACTOR = 350;
+    private final int STARTING_LIVES = 5;
     private int MAX_SPEED = 400;
     private float SPEED_INCREASE_FACTOR = 1.19f;
     private int SIZE_FACTOR = 8; // Tamaño de los invasores
     public int SCORE_REWARD = 100;
     // Para alterar la frecuencia de los disparos
-    private int CHANCE_NEAR = 100;
-    private int CHANCE_FAR = 300;
+    private int CHANCE_NEAR = 50;
+    private int CHANCE_FAR = 150;
 
-    int currentLives;
+
 
     Random randomGenerator = new Random();
+    private static Bitmap[] invaderDamage =
+            {       BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss_damage1),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss_damage2),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss_damage3),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss_damage4),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss2),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss2_damage1),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss2_damage2),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss2_damage3),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.boss2_damage4)};
+    int animationIndex = 5; // Cuantos estados hay por cada tipo (Boss / Boss2 en este caso ^)
 
 
     public Boss(Context context, int y) {
@@ -39,7 +51,7 @@ public class Boss extends Invader {
 
         isVisible = true;
         currentLives = STARTING_LIVES;
-        movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
+        movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble());
         currentMovement = Movement.RIGHT;
 
         // TODO posX = width + randomGenerator.nextInt( (int)(screenX - (width * 2)));
@@ -49,8 +61,8 @@ public class Boss extends Invader {
         // Incializar bitmaps y escalarlos
         bitmapSize = 1;
         bitmap = new Bitmap[bitmapSize]; // TODO Agregar explosion
-        bitmap[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.boss);
-        bitmap[0] = Bitmap.createScaledBitmap(bitmap[0], (int) (width), (int) (height),false);
+        bitmap[0] = Bitmap.createScaledBitmap(invaderDamage[0], (int) (width), (int) (height),false);
+
         bitmapIndex = 0;
         currentBitmap = bitmap[bitmapIndex];
     }
@@ -71,17 +83,25 @@ public class Boss extends Invader {
         return shoot;
     }
 
-    public boolean damageBoss(){
-        boolean heDead;
-        currentLives--;
-        heDead = currentLives <= 0;
-        return heDead;
+    @Override
+    public boolean dealDamage(){
+        boolean dead = super.dealDamage();
+        if(!dead){
+            currentBitmap = Bitmap.createScaledBitmap( invaderDamage[++bitmapIndex], (int) (width), (int) (height),false);
+        }
+        return dead;
     }
 
 
     public void shoot(){
-        GameView.invaderProjectiles.add(new Projectile(posX + (width / 3), posY + (height/2), Movement.DOWN_LEFT));
-        GameView.invaderProjectiles.add(new Projectile(posX + (width / 3) * 2, posY + (height/2), Movement.DOWN_RIGHT));
+        if(randomGenerator.nextInt(10) < 8){
+            GameView.invaderProjectiles.add(new Projectile(posX + (width / 3), posY + (height/2), Movement.DOWN_LEFT));
+            GameView.invaderProjectiles.add(new Projectile(posX + (width / 3) * 2, posY + (height/2), Movement.DOWN_RIGHT));
+        }else{
+            GameView.invaderProjectiles.add(new Projectile(posX + (width / 4), posY + (height/3), Movement.DOWN));
+            GameView.invaderProjectiles.add(new Projectile(posX + (width / 2), posY + (height/2), Movement.DOWN));
+            GameView.invaderProjectiles.add(new Projectile(posX + (width / 4) * 3, posY + (height/3), Movement.DOWN));
+        }
     }
 
     @Override
@@ -106,9 +126,24 @@ public class Boss extends Invader {
         super.update(fps);
     }
 
+    @Override
+    public void borderCollision(byte border) {
+        super.borderCollision(border);
+        switch (randomGenerator.nextInt(3)){
+            case 0:
+                currentMovement |= Movement.UP;
+                break;
+            case 1:
+                currentMovement|= Movement.DOWN;
+                break;
+            default:
+                break;
+        }
+    }
+
     private void kamikazeMovement(float spaceshipX){
         // Modo kamikaze (Agrega el bit de movimiento hacia abajo)
-        if((currentMovement & Movement.DOWN) == 0 && randomGenerator.nextInt(8000) < 10){
+        if((currentMovement & Movement.DOWN) == 0 && randomGenerator.nextInt(5000) < 10){
             currentMovement |= Movement.DOWN;
         }
         // Si se mueve hacia abajo (diagonal)
@@ -170,5 +205,9 @@ public class Boss extends Invader {
                 currentMovement = Movement.RIGHT;
                 break;
         }
+    }
+
+    public Bitmap getBitmap(int i){
+        return Bitmap.createScaledBitmap( invaderDamage[i*animationIndex + bitmapIndex], (int) (width), (int) (height),false);
     }
 }

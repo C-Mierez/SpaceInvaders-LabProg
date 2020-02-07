@@ -1,6 +1,12 @@
 package Classes;
 
+import android.graphics.Bitmap;
+
 public abstract class Invader extends Entity{
+
+    int currentLives;
+    int animationIndex;
+    private static Bitmap[] invaderDamage;
 
     public abstract boolean tryShooting(float playershipX, float playershipWdith);
 
@@ -26,5 +32,11 @@ public abstract class Invader extends Entity{
                 break;
         }
     }
+
+    public boolean dealDamage(){
+        return --currentLives <= 0;
+    }
+
+    public abstract Bitmap getBitmap(int i);
 
 }

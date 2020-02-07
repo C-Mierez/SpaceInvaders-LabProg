@@ -4,7 +4,6 @@ package Classes;
 // Además, es quien responde a las entradas por pantalla
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -31,18 +30,21 @@ public class GameView extends SurfaceView implements Runnable {
     private final int COLUMN_INVADERS = 6; // Se crean 1 menos que el numero
     private final int ROW_DEFENSE = 4;
     private final int COLUMN_DEFENSE = 8;
-    private final int SHELTER_DEFENSE_AMOUNT = 6; // Se crean 1 menos que el numero
+    private final int SHELTER_DEFENSE_AMOUNT = 5; // Se crean 1 menos que el numero
     private final float SHELTER_DECREASE_FACTOR = 1.17f;
-    private final int STARTING_LIVES = 500;
-    private final int STARTING_MENACE_INTERVAL = 1000;
     private final float INVADER_INCREASE_FACTOR = 1.4f;
     private final int STARTING_INVADER_AMOUNT = 6;
+    private final int MAX_INVADER_AMOUNT = 35;
+    private float UFO_CHANCE_FACTOR = 1.2f;
+    private int UFO_CHANCE = 10;
     private final byte INCREASE_SPEED_LIMIT = 10;
     private final int MIN_MENACE_INTERVAL = 240;
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
     private final int SCORE_TO_WIN = 30;
-    private final int LEVELS_FOR_BOSS = 1; // TODO Cambiar
+    private final int LEVELS_FOR_BOSS = 3; // TODO Cambiar
+    private final int STARTING_LIVES = 3;
+    private final int STARTING_MENACE_INTERVAL = 1000;
 
     // Hilo del juego
     private Thread gameThread = null;
@@ -69,7 +71,7 @@ public class GameView extends SurfaceView implements Runnable {
     // TODO Proyectiles de los Invasores
     public static LinkedBlockingQueue<Projectile> invaderProjectiles;
     // Invasores
-    public static LinkedBlockingQueue<Entity> invaders;
+    public static LinkedBlockingQueue<Invader> invaders;
     // Bloques de defensa
     public static LinkedBlockingQueue<DefenseBlock> defenseBlocks;
     // Bosses
@@ -202,7 +204,7 @@ public class GameView extends SurfaceView implements Runnable {
             if (invader.isVisible()) {
                 if (RectF.intersects(invader.getRect(), spaceship.getRect())) {
                     // TODO Perdida
-                    lose();
+                    currentLives = 0;
                 }
             }
         }
@@ -210,7 +212,7 @@ public class GameView extends SurfaceView implements Runnable {
             if (boss.isVisible()) {
                 if (RectF.intersects(boss.getRect(), spaceship.getRect())) {
                     // TODO Perdida
-                    lose();
+                    currentLives = 0;
                 }
             }
         }
@@ -241,10 +243,16 @@ public class GameView extends SurfaceView implements Runnable {
         }
         // Colision del proyectil con un invasor
         if (spaceshipProjectile.isVisible()) {
-            for (Entity invader : invaders) {
+            for (Invader invader : invaders) {
                 if (invader.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), invader.getRect())) {
-                        destroyEntities(invader, spaceshipProjectile, true, invaderExplodeID);
+                        if(invader.dealDamage()){
+                            // Si muere
+                            destroyEntities(invader, spaceshipProjectile, true, invaderExplodeID);
+                        }else{
+                            soundPool.play(invaderExplodeID, 1, 1, 0, 0, 1);
+                            spaceshipProjectile.setVisible(false);
+                        }
                     }
                 }
             }
@@ -253,7 +261,7 @@ public class GameView extends SurfaceView implements Runnable {
             for (Boss boss : bosses) {
                 if (boss.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), boss.getRect())) {
-                        if(boss.damageBoss()){
+                        if(boss.dealDamage()){
                             destroyEntities(boss, spaceshipProjectile, true, invaderExplodeID);
                         }else{ // TODO Cambiar sonido
                             soundPool.play(invaderExplodeID, 1, 1, 0, 0, 1);
@@ -372,19 +380,23 @@ public class GameView extends SurfaceView implements Runnable {
             canvas.drawBitmap(spaceship.getCurrentBitmap(), spaceship.getPosX(), spaceship.getPosY(), paint);
 
             // Dibujar los invasores
-            for (Entity invader : invaders) {
+            for (Invader invader : invaders) {
                 if (invader != null && invader.isVisible()) {
                         if (uhOrOh) {
-                            canvas.drawBitmap(invader.getBitmap()[0], invader.getPosX(), invader.getPosY(), paint);
+                            canvas.drawBitmap(invader.getBitmap(0), invader.getPosX(), invader.getPosY(), paint);
                         } else {
-                            canvas.drawBitmap(invader.getBitmap()[1], invader.getPosX(), invader.getPosY(), paint);
+                            canvas.drawBitmap(invader.getBitmap(1), invader.getPosX(), invader.getPosY(), paint);
                         }
                 }
             }
             // Dibujar los bosses
             for(Boss boss : bosses){
                 if (boss != null && boss.isVisible()) {
-                    canvas.drawBitmap(boss.getCurrentBitmap(), boss.getPosX(), boss.getPosY(), paint);
+                    if(uhOrOh){
+                        canvas.drawBitmap(boss.getBitmap(0), boss.getPosX(), boss.getPosY(), paint);
+                    }else{
+                        canvas.drawBitmap(boss.getBitmap(1), boss.getPosX(), boss.getPosY(), paint);
+                    }
                 }
             }
 
@@ -408,7 +420,7 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
             // Dinujar los stats
-            paint.setColor(Color.argb(255, 249, 129, 0));
+            paint.setColor(Color.argb(255, 255, 255, 255));
             paint.setTextSize(40);
             canvas.drawText("Score: " + currentScore + "   Lives: " + currentLives + "   Level: " + currentLevel, 10, 50, paint);
 
@@ -448,7 +460,7 @@ public class GameView extends SurfaceView implements Runnable {
         // Crear las filas de invasores al azar
         invaders = new LinkedBlockingQueue<>();
         for (int i = 0; i < invaderAmount; i++) {
-            if(random.nextInt(5) > 1){ // Crear Crabs
+            if(random.nextInt(100) > UFO_CHANCE * UFO_CHANCE_FACTOR){ // Crear Crabs
                 invaders.add(new Crab(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
             }else{ // Crear UFO
                 invaders.add(new UFO(context,  screenY / BAR_PADDING_FACTOR + (random.nextInt(screenY / BAR_PADDING_FACTOR * 5))));
@@ -456,7 +468,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
         // Crear bloques
         defenseBlocks = new LinkedBlockingQueue<>();
-        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT)+1;
+        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT)+2;
         for (int shelterNumber = 1; shelterNumber < shelterAmount; shelterNumber++) {
             for (int i = 0; i < ROW_DEFENSE; i++) {
                 for (int x = 0; x < COLUMN_DEFENSE; x++) {
@@ -471,7 +483,14 @@ public class GameView extends SurfaceView implements Runnable {
         currentScore = 0;
         currentLives = STARTING_LIVES;
         */
-        invaderAmount *= INVADER_INCREASE_FACTOR;
+        // Aumentar cantidad siempre y cuando se respete el limite
+        if (invaderAmount * INVADER_INCREASE_FACTOR < MAX_INVADER_AMOUNT) {
+            invaderAmount *= INVADER_INCREASE_FACTOR;
+        }else{
+            invaderAmount = MAX_INVADER_AMOUNT;
+        }
+        // Aumentar chance de UFOs
+        UFO_CHANCE *= UFO_CHANCE_FACTOR;
         resetValues();
     }
 
@@ -490,7 +509,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
         // Crear bloques
         defenseBlocks = new LinkedBlockingQueue<>();
-        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT)+1;
+        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT-2)+4;
         for (int shelterNumber = 1; shelterNumber < shelterAmount; shelterNumber++) {
             for (int i = 0; i < ROW_DEFENSE; i++) {
                 for (int x = 0; x < COLUMN_DEFENSE; x++) {

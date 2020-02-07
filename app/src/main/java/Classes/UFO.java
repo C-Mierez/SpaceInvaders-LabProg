@@ -13,16 +13,24 @@ public class UFO extends Invader {
 
     // Parametros configurables
     private int SPEED_FACTOR = 100;
+    private final int STARTING_LIVES = 2;
     private int MAX_SPEED = 400;
     private float SPEED_INCREASE_FACTOR = 1.19f;
     private int SIZE_FACTOR = 24; // Tamaño de los invasores
     public int SCORE_REWARD = 25;
     // Para alterar la frecuencia de los disparos
-    private int CHANCE_NEAR = 150;
-    private int CHANCE_FAR = 2000;
+    private int CHANCE_NEAR = 60;
+    private int CHANCE_FAR = 1600;
 
 
     Random randomGenerator = new Random();
+
+    private static Bitmap[] invaderDamage =
+            {       BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.ufo_better),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.ufo_better_damage1),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.ufo_better2),
+                    BitmapFactory.decodeResource(GameView.context.getResources(), R.drawable.ufo_better2_damage1),};
+    int animationIndex = 2; // Cuantos estados hay por cada tipo
 
 
     public UFO(Context context, int y) {
@@ -42,13 +50,21 @@ public class UFO extends Invader {
         posX = width + randomGenerator.nextInt( (int)(screenX - (width * 2)));
         posY = y;
 
+        currentLives = STARTING_LIVES;
+
         // Incializar bitmaps y escalarlos
         bitmap = new Bitmap[3]; // TODO Agregar explosion
-        bitmap[0] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ufo_better);
-        bitmap[0] = Bitmap.createScaledBitmap(bitmap[0], (int) (width), (int) (height),false);
-        bitmap[1] = BitmapFactory.decodeResource(context.getResources(), R.drawable.ufo_better2);
-        bitmap[1] = Bitmap.createScaledBitmap(bitmap[1], (int) (width), (int) (height),false);
-        currentBitmap = bitmap[0];
+        bitmapIndex = 0;
+        currentBitmap = Bitmap.createScaledBitmap(invaderDamage[bitmapIndex], (int) (width), (int) (height),false);
+    }
+
+    @Override
+    public boolean dealDamage(){
+        boolean dead = super.dealDamage();
+        if (!dead) {
+            currentBitmap = Bitmap.createScaledBitmap( invaderDamage[++bitmapIndex], (int) (width), (int) (height),false);
+        }
+        return dead;
     }
 
     public boolean tryShooting(float playerShipX, float playerShipLength){
@@ -69,7 +85,13 @@ public class UFO extends Invader {
 
 
     public void shoot(){
-        GameView.invaderProjectiles.add(new Projectile(posX + width / 2, posY, Movement.DOWN));
+        if(randomGenerator.nextInt(10) < 8){
+            GameView.invaderProjectiles.add(new Projectile(posX + width / 2, posY, Movement.DOWN));
+        }else{
+            GameView.invaderProjectiles.add(new Projectile(posX + width / 3, posY, Movement.DOWN));
+            GameView.invaderProjectiles.add(new Projectile(posX + width / 3 * 2, posY, Movement.DOWN));
+
+        }
     }
 
     @Override
@@ -116,5 +138,9 @@ public class UFO extends Invader {
                 currentMovement = Movement.DOWN;
             }
         }
+    }
+
+    public Bitmap getBitmap(int i){
+        return Bitmap.createScaledBitmap( invaderDamage[i*animationIndex + bitmapIndex], (int) (width), (int) (height),false);
     }
 }
