@@ -257,6 +257,7 @@ public class GameView extends SurfaceView implements Runnable {
                             destroyEntities(boss, spaceshipProjectile, true, invaderExplodeID);
                         }else{ // TODO Cambiar sonido
                             soundPool.play(invaderExplodeID, 1, 1, 0, 0, 1);
+                            spaceshipProjectile.setVisible(false);
                         }
                     }
                 }

@@ -12,8 +12,8 @@ import java.util.Random;
 public class Boss extends Invader {
 
     // Parametros configurables
-    private int SPEED_FACTOR = 250;
-    private int STARTING_LIVES = 3;
+    private final int SPEED_FACTOR = 250;
+    private final int STARTING_LIVES = 3;
     private int MAX_SPEED = 400;
     private float SPEED_INCREASE_FACTOR = 1.19f;
     private int SIZE_FACTOR = 8; // Tamaño de los invasores
@@ -72,8 +72,10 @@ public class Boss extends Invader {
     }
 
     public boolean damageBoss(){
+        boolean heDead;
         currentLives--;
-        return (currentLives == 0);
+        heDead = currentLives <= 0;
+        return heDead;
     }
 
 
