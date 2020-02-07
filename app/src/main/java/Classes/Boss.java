@@ -18,8 +18,8 @@ public class Boss extends Invader {
     private int SIZE_FACTOR = 8; // Tamaño de los invasores
     public int SCORE_REWARD = 100;
     // Para alterar la frecuencia de los disparos
-    private int CHANCE_NEAR = 20;
-    private int CHANCE_FAR = 800;
+    private int CHANCE_NEAR = 100;
+    private int CHANCE_FAR = 300;
 
 
     Random randomGenerator = new Random();

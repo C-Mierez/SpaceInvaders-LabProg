@@ -14,7 +14,7 @@ public class Projectile extends Entity{
     // Algunos parametros
     private final int HEIGHT_FACTOR = 25;
     public final int SPEED_FACTOR = 550;
-    public final int WIDTH = 16;
+    public final int WIDTH = 24;
 
     Random randomGenerator = new Random();
 
@@ -29,7 +29,7 @@ public class Projectile extends Entity{
         screenX = GameView.screenX;
         screenY = GameView.screenY;
 
-        height = screenY / HEIGHT_FACTOR;
+        height = WIDTH*2;
         width = WIDTH;
         isVisible = false;
 
@@ -50,7 +50,7 @@ public class Projectile extends Entity{
         screenX = GameView.screenX;
         screenY = GameView.screenY;
 
-        height = screenY / HEIGHT_FACTOR;
+        height = WIDTH;
         width = WIDTH;
 
         posX = startX;
@@ -65,13 +65,13 @@ public class Projectile extends Entity{
         bitmap = new Bitmap[bitmapSize];
         bitmapIndex = 0;
         if(currentMovement == Movement.UP){
-            currentBitmap = Bitmap.createScaledBitmap(projectiles[3], (int) (width), (int) (height),false);
+            currentBitmap = Bitmap.createScaledBitmap(projectiles[3], (int) (width), (int) (height*2),false);
         }else if(currentMovement == Movement.DOWN){
-            currentBitmap = Bitmap.createScaledBitmap(projectiles[0], (int) (width), (int) (height),false);
+            currentBitmap = Bitmap.createScaledBitmap(projectiles[0], (int) (width), (int) (height*2),false);
         } else if((currentMovement & Movement.LEFT) > 0 || (currentMovement & Movement.RIGHT) > 0){
             currentBitmap = randomGenerator.nextInt(2) == 0 ?
-                    Bitmap.createScaledBitmap(projectiles[1], (int) (width), (int) (height),false) :
-                    Bitmap.createScaledBitmap(projectiles[2], (int) (width), (int) (height),false); // Si. Esto lo hicimos nosotros.
+                    Bitmap.createScaledBitmap(projectiles[1], (int) (width*2), (int) (height*2),false) :
+                    Bitmap.createScaledBitmap(projectiles[2], (int) (width*2), (int) (height*2),false); // Si. Esto lo hicimos nosotros.
         }
 
         movementSpeed = SPEED_FACTOR;

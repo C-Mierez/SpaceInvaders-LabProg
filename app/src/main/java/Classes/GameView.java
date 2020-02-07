@@ -42,7 +42,7 @@ public class GameView extends SurfaceView implements Runnable {
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
     private final int SCORE_TO_WIN = 30;
-    private final int LEVELS_FOR_BOSS = 3; // TODO Cambiar
+    private final int LEVELS_FOR_BOSS = 1; // TODO Cambiar
 
     // Hilo del juego
     private Thread gameThread = null;
@@ -393,7 +393,7 @@ public class GameView extends SurfaceView implements Runnable {
             // Dibujar el proyectil del Spaceship y de los Invasores
             if (spaceshipProjectile.isVisible()) {
                 //canvas.drawRect(spaceshipProjectile.getRect(), paint);
-                canvas.drawBitmap(spaceship.getCurrentBitmap(), spaceship.getPosX(), spaceship.getPosY(), paint);
+                canvas.drawBitmap(spaceshipProjectile.getCurrentBitmap(), spaceshipProjectile.getPosX(), spaceshipProjectile.getPosY(), paint);
             }
             for (Projectile projectile : invaderProjectiles) {
                 if (projectile != null && projectile.isVisible()) {
