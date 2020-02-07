@@ -70,8 +70,8 @@ public class Boss extends Invader {
 
 
     public void shoot(){
-        GameView.invaderProjectiles.add(new Projectile(posX + (width / 3), posY, Movement.DOWN));
-        GameView.invaderProjectiles.add(new Projectile(posX + (width / 3) * 2, posY, Movement.DOWN));
+        GameView.invaderProjectiles.add(new Projectile(posX + (width / 3), posY + (height/2), Movement.DOWN_LEFT));
+        GameView.invaderProjectiles.add(new Projectile(posX + (width / 3) * 2, posY + (height/2), Movement.DOWN_RIGHT));
     }
 
     @Override
