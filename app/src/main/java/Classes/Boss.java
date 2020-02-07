@@ -13,6 +13,7 @@ public class Boss extends Invader {
 
     // Parametros configurables
     private int SPEED_FACTOR = 250;
+    private int STARTING_LIVES = 3;
     private int MAX_SPEED = 400;
     private float SPEED_INCREASE_FACTOR = 1.19f;
     private int SIZE_FACTOR = 8; // Tamaño de los invasores
@@ -21,6 +22,7 @@ public class Boss extends Invader {
     private int CHANCE_NEAR = 100;
     private int CHANCE_FAR = 300;
 
+    int currentLives;
 
     Random randomGenerator = new Random();
 
@@ -36,6 +38,7 @@ public class Boss extends Invader {
         height = screenY / SIZE_FACTOR;
 
         isVisible = true;
+        currentLives = STARTING_LIVES;
         movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble() * (randomGenerator.nextInt(2) + 1));
         currentMovement = Movement.RIGHT;
 
@@ -66,6 +69,11 @@ public class Boss extends Invader {
             shoot = randomNumber == 1;
         }
         return shoot;
+    }
+
+    public boolean damageBoss(){
+        currentLives--;
+        return (currentLives == 0);
     }
 
 

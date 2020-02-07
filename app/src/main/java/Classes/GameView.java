@@ -250,10 +250,14 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
         if (spaceshipProjectile.isVisible()) {
-            for (Entity boss : bosses) {
+            for (Boss boss : bosses) {
                 if (boss.isVisible()) {
                     if (RectF.intersects(spaceshipProjectile.getRect(), boss.getRect())) {
-                        destroyEntities(boss, spaceshipProjectile, true, invaderExplodeID);
+                        if(boss.damageBoss()){
+                            destroyEntities(boss, spaceshipProjectile, true, invaderExplodeID);
+                        }else{ // TODO Cambiar sonido
+                            soundPool.play(invaderExplodeID, 1, 1, 0, 0, 1);
+                        }
                     }
                 }
             }
@@ -451,7 +455,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
         // Crear bloques
         defenseBlocks = new LinkedBlockingQueue<>();
-        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT);
+        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT)+1;
         for (int shelterNumber = 1; shelterNumber < shelterAmount; shelterNumber++) {
             for (int i = 0; i < ROW_DEFENSE; i++) {
                 for (int x = 0; x < COLUMN_DEFENSE; x++) {
@@ -485,7 +489,7 @@ public class GameView extends SurfaceView implements Runnable {
         }
         // Crear bloques
         defenseBlocks = new LinkedBlockingQueue<>();
-        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT);
+        shelterAmount = random.nextInt(SHELTER_DEFENSE_AMOUNT)+1;
         for (int shelterNumber = 1; shelterNumber < shelterAmount; shelterNumber++) {
             for (int i = 0; i < ROW_DEFENSE; i++) {
                 for (int x = 0; x < COLUMN_DEFENSE; x++) {
