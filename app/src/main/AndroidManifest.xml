@@ -9,17 +9,26 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <!-- Quitamos la barra de navegaciñon y forzamos la aplicación a que esté en modo de pantalla
-        horizontal permanentemente -->
         <activity
-            android:name=".MainActivity"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-            android:screenOrientation="landscape">
+            android:name=".MenuActivity"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <!--
+         Quitamos la barra de navegacion y forzamos la aplicación a que esté en modo de pantalla
+        horizontal permanentemente
+        -->
+        <activity
+            android:name=".MainActivity"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
+
         </activity>
     </application>
 
