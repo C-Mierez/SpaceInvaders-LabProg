@@ -141,12 +141,11 @@ public class GameView extends SurfaceView implements Runnable {
         invaderProjectiles = new LinkedBlockingQueue<>();
         invaders = new LinkedBlockingQueue<>();
         bosses = new LinkedBlockingQueue<>();
-        //prepareLevel();
+        prepareLevel();
     }
 
     @Override
     public void run() {
-        prepareLevel();
         while (gamePlaying) {
             // Tiempo en milisegundos actuales para startFrameTime
             long startFrameTime = System.currentTimeMillis();
@@ -461,8 +460,6 @@ public class GameView extends SurfaceView implements Runnable {
                 //TODO Mostrar score, y demas cosas.
             }
         }, 3000);
-
-
     }
 
     private void prepareLevel() {

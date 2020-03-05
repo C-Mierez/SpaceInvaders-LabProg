@@ -6,13 +6,11 @@ import android.graphics.RectF;
 
 import com.example.spaceinvaders_labprogramacion.R;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 public class Projectile extends Entity{
 
     // Algunos parametros
-    private final int HEIGHT_FACTOR = 25;
     public final int SPEED_FACTOR = 550;
     public final int WIDTH = 24;
 
