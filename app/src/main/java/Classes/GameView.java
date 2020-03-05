@@ -20,6 +20,7 @@ import android.view.SurfaceView;
 import com.example.spaceinvaders_labprogramacion.MainActivity;
 import com.example.spaceinvaders_labprogramacion.MenuActivity;
 import com.example.spaceinvaders_labprogramacion.R;
+import com.example.spaceinvaders_labprogramacion.ScoreActivity;
 
 import java.util.Random;
 import java.util.Timer;
@@ -163,7 +164,7 @@ public class GameView extends SurfaceView implements Runnable {
             // Sonidito uUrUURuoogogo UWU
             if (!gamePaused) {
                 increaseSpeed(startFrameTime);
-                if (currentLives == 0) {
+                if (currentLives <= 0) {
                     lose();
                 }
                 if (invaders.isEmpty() && bosses.isEmpty()) {
@@ -451,13 +452,13 @@ public class GameView extends SurfaceView implements Runnable {
         gamePaused = true;
         spaceship.setCurrentBitmap(spaceship.getBitmap()[1]);
         //draw();
-        final Intent i = new Intent(context, MenuActivity.class);
+        final Intent i = new Intent(context, ScoreActivity.class);
+        i.putExtra("score", currentScore);
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
                 context.startActivity(i);
                 ((Activity) context).finish();
-                //TODO Mostrar score, y demas cosas.
             }
         }, 3000);
     }
