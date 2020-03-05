@@ -3,20 +3,27 @@ package Classes;
 // Esta clase contiene toda la lógica del juego
 // Además, es quien responde a las entradas por pantalla
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.media.AudioManager;
 import android.media.SoundPool;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.example.spaceinvaders_labprogramacion.MainActivity;
+import com.example.spaceinvaders_labprogramacion.MenuActivity;
 import com.example.spaceinvaders_labprogramacion.R;
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class GameView extends SurfaceView implements Runnable {
@@ -109,7 +116,7 @@ public class GameView extends SurfaceView implements Runnable {
         screenY = y;
 
         soundPool = new SoundPool.Builder().build();
-        //soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0); No se usa esto mas. Es un metodo viejo
+        //soundPool = new SoundPool(10, AudioManager.STREAM_MUSIC,0); //No se usa esto mas. Es un metodo viejo
 
         try {
             // Cargar los sonidos
@@ -444,11 +451,21 @@ public class GameView extends SurfaceView implements Runnable {
     private void lose() {
         gamePaused = true;
         spaceship.setCurrentBitmap(spaceship.getBitmap()[1]);
-        draw();
+        //draw();
+        final Intent i = new Intent(context, MenuActivity.class);
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                context.startActivity(i);
+                ((Activity) context).finish();
+                //TODO Mostrar score, y demas cosas.
+            }
+        }, 3000);
+
+
     }
 
     private void prepareLevel() {
-
         // Posicionar la nave en el lugar adecuado
         spaceship.setPosX((screenX / spaceship.STARTING_X_FACTOR) - (spaceship.width / 2));
         spaceship.setPosY(screenY - (screenY / spaceship.STARTING_Y_FACTOR));
