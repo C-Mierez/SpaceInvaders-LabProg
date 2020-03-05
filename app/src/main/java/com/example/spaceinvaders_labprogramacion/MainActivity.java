@@ -2,7 +2,9 @@ package com.example.spaceinvaders_labprogramacion;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.view.Display;
@@ -16,6 +18,7 @@ public class MainActivity extends Activity {
 
     GameView gameView;
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +33,7 @@ public class MainActivity extends Activity {
         // Inicializar gameView con los datos obtenidos
         gameView = new GameView(this, screenResolution.x, screenResolution.y);
         setContentView(gameView);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
     }
 
     @Override

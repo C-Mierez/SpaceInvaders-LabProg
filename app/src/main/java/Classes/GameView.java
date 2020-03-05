@@ -48,7 +48,7 @@ public class GameView extends SurfaceView implements Runnable {
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
     private final int LEVELS_FOR_BOSS = 3; // TODO Cambiar
-    private final int STARTING_LIVES = 3;
+    private final int STARTING_LIVES = 5;
     private final int STARTING_MENACE_INTERVAL = 1000;
 
     // Hilo del juego
