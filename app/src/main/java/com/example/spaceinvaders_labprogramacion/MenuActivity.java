@@ -37,7 +37,6 @@ public class MenuActivity extends Activity {
         System.exit(0);
     }
 
-    //TODO Hacer funcionar lo del audio
     public void mute (View view) {
         AudioManager amanager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         amanager.setStreamMute(AudioManager.STREAM_MUSIC,true);

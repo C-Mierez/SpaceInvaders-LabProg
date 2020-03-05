@@ -13,13 +13,11 @@ public class DefenseBlock extends Entity {
         screenX = GameView.screenX;
         screenY = GameView.screenY;
 
-        // TODO Pasar todos los parametros de abajo a constantes para mas facil configuracion
         int width = screenX / WIDTH_FACTOR;
         int height = screenY / HEIGHT_FACTOR;
 
         isVisible = true;
         int brickPadding = 1;
-        // TODO Comentar
 
         posX = (shelterNumber * left_padding ) + (column * (width + brickPadding) - (totalColumns / 2 * (width + brickPadding)));
         posY= startHeight + (row * (height + brickPadding));
