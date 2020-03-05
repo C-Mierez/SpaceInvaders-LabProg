@@ -50,7 +50,7 @@ public class Crab extends Invader {
 
         // Incializar bitmaps y escalarlos
         bitmapSize = 2;
-        bitmap = new Bitmap[bitmapSize]; // TODO Agregar explosion
+        bitmap = new Bitmap[bitmapSize];
         bitmapIndex = 0;
         currentBitmap = Bitmap.createScaledBitmap(invaderDamage[bitmapIndex], (int) (width), (int) (height),false);
     }
@@ -75,7 +75,7 @@ public class Crab extends Invader {
 
         // Incializar bitmaps y escalarlos
         bitmapSize = 2;
-        bitmap = new Bitmap[bitmapSize]; // TODO Agregar explosion
+        bitmap = new Bitmap[bitmapSize];
         bitmapIndex = 0;
         currentBitmap = Bitmap.createScaledBitmap(invaderDamage[bitmapIndex], (int) (width), (int) (height),false);
     }

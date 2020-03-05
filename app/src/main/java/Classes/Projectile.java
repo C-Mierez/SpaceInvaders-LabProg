@@ -33,7 +33,6 @@ public class Projectile extends Entity{
 
         rectF = new RectF();
 
-        // TODO El proyectil no usa imagen por ahora
         bitmapSize = 3;
         bitmap = new Bitmap[bitmapSize];
 
@@ -58,7 +57,6 @@ public class Projectile extends Entity{
 
         rectF = new RectF();
 
-        // TODO El proyectil no usa imagen por ahora
         bitmapSize = 3;
         bitmap = new Bitmap[bitmapSize];
         bitmapIndex = 0;

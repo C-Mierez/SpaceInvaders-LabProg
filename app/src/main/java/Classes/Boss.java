@@ -54,13 +54,12 @@ public class Boss extends Invader {
         movementSpeed = SPEED_FACTOR + (int)(SPEED_FACTOR * randomGenerator.nextDouble());
         currentMovement = Movement.RIGHT;
 
-        // TODO posX = width + randomGenerator.nextInt( (int)(screenX - (width * 2)));
         posX = (screenX / 2) - (width / 2);
         posY = y;
 
         // Incializar bitmaps y escalarlos
         bitmapSize = 1;
-        bitmap = new Bitmap[bitmapSize]; // TODO Agregar explosion
+        bitmap = new Bitmap[bitmapSize];
         bitmap[0] = Bitmap.createScaledBitmap(invaderDamage[0], (int) (width), (int) (height),false);
 
         bitmapIndex = 0;
@@ -108,7 +107,6 @@ public class Boss extends Invader {
             } else{
                 GameView.invaders.add(new Crab(posX + width/2, posY - height));
             }
-            // TODO esto esta feo
             GameView.soundPool.play(GameView.evilLaughID, 1,1,1,0,1);
         }
     }

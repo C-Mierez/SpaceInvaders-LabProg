@@ -53,7 +53,7 @@ public class UFO extends Invader {
         currentLives = STARTING_LIVES;
 
         // Incializar bitmaps y escalarlos
-        bitmap = new Bitmap[3]; // TODO Agregar explosion
+        bitmap = new Bitmap[3];
         bitmapIndex = 0;
         currentBitmap = Bitmap.createScaledBitmap(invaderDamage[bitmapIndex], (int) (width), (int) (height),false);
     }
@@ -77,7 +77,7 @@ public class UFO extends Invader {
         currentLives = STARTING_LIVES;
 
         // Incializar bitmaps y escalarlos
-        bitmap = new Bitmap[3]; // TODO Agregar explosion
+        bitmap = new Bitmap[3];
         bitmapIndex = 0;
         currentBitmap = Bitmap.createScaledBitmap(invaderDamage[bitmapIndex], (int) (width), (int) (height),false);
     }

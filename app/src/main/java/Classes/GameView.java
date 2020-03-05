@@ -47,8 +47,8 @@ public class GameView extends SurfaceView implements Runnable {
     private final int MIN_MENACE_INTERVAL = 240;
     private final int MENACE_INTERVAL_FACTOR = 60; // Cantidad a la que se reduce el intervalo cada vez que se chocan los bordes
     private final int SCORE_FACTOR = 1; // Este factor multiplica el valor de puntos que otorga cada enemigo
-    private final int LEVELS_FOR_BOSS = 3; // TODO Cambiar
-    private final int STARTING_LIVES = 3;
+    private final int LEVELS_FOR_BOSS = 3;
+    private final int STARTING_LIVES = 5;
     private final int STARTING_MENACE_INTERVAL = 1000;
 
     // Hilo del juego
@@ -73,7 +73,6 @@ public class GameView extends SurfaceView implements Runnable {
     // Proyectil del jugador
     private Projectile spaceshipProjectile;
 
-    // TODO Proyectiles de los Invasores
     public static LinkedBlockingQueue<Projectile> invaderProjectiles;
     // Invasores
     public static LinkedBlockingQueue<Invader> invaders;
@@ -209,7 +208,6 @@ public class GameView extends SurfaceView implements Runnable {
         for (Entity invader : invaders) {
             if (invader.isVisible()) {
                 if (RectF.intersects(invader.getRect(), spaceship.getRect())) {
-                    // TODO Perdida
                     currentLives = 0;
                 }
             }
@@ -217,12 +215,10 @@ public class GameView extends SurfaceView implements Runnable {
         for (Entity boss : bosses) {
             if (boss.isVisible()) {
                 if (RectF.intersects(boss.getRect(), spaceship.getRect())) {
-                    // TODO Perdida
                     currentLives = 0;
                 }
             }
         }
-        // TODO Colision de invasor con bloques
         for (Entity invader : invaders) {
             if (invader.isVisible()) {
                 for (DefenseBlock block : defenseBlocks) {
@@ -269,7 +265,7 @@ public class GameView extends SurfaceView implements Runnable {
                     if (RectF.intersects(spaceshipProjectile.getRect(), boss.getRect())) {
                         if(boss.dealDamage()){
                             destroyEntities(boss, spaceshipProjectile, true, invaderExplodeID);
-                        }else{ // TODO Cambiar sonido
+                        }else{
                             soundPool.play(invaderExplodeID, 1, 1, 0, 0, 1);
                             spaceshipProjectile.setVisible(false);
                         }
@@ -351,7 +347,6 @@ public class GameView extends SurfaceView implements Runnable {
     private void damagePlayer(Entity entity) {
         entity.setVisible(false);
         currentLives--;
-        // TODO Sound PlayerExplode
         soundPool.play(playerExplodeID, 1, 1, 0, 0, 1);
     }
 
@@ -363,7 +358,6 @@ public class GameView extends SurfaceView implements Runnable {
         if (gainScore) {
             currentScore += (entity.getScoreReward() + entity2.getScoreReward()) * SCORE_FACTOR;
         }
-        // TODO Sound InvaderExplode
         soundPool.play(soundID, 1, 1, 0, 0, 1);
     }
 
@@ -492,11 +486,6 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
-        // TODO Guardar score de rondas anteriores
-        /*
-        currentScore = 0;
-        currentLives = STARTING_LIVES;
-        */
         // Aumentar cantidad siempre y cuando se respete el limite
         if (invaderAmount * INVADER_INCREASE_FACTOR < MAX_INVADER_AMOUNT) {
             invaderAmount *= INVADER_INCREASE_FACTOR;
@@ -533,10 +522,6 @@ public class GameView extends SurfaceView implements Runnable {
                 }
             }
         }
-        // TODO Guardar score de rondas anteriores
-        /*
-        currentScore = 0;
-        */
         resetValues();
     }
 
@@ -579,7 +564,6 @@ public class GameView extends SurfaceView implements Runnable {
                 } else {
                     // Para disparar
                     if (spaceshipProjectile.shoot(spaceship.getPosX() + (spaceship.getWidth() / 2), spaceship.getPosY() - (spaceship.getHeight() / 2), Movement.UP)) {
-                        // TODO Sound Shoot
                         soundPool.play(shootID, 1, 1, 0, 0, 1);
                     }
                 }
